@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upgrade Your Plan - Razorpay Payment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+        
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        .pricing-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .pricing-card.featured {
+            border: 3px solid #667eea;
+            position: relative;
+        }
+        
+        .badge {
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            background: #667eea;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .price {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .price-currency {
+            font-size: 1.5rem;
+        }
+        
+        .price-period {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+        
+        .features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+        
+        .features li {
+            padding: 0.75rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #555;
+        }
+        
+        .features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #48BB78;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .pay-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .pay-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .pay-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .payment-methods {
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #888;
+        }
+        
+        .method-icons {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .method-icon {
+            background: #f0f0f0;
+            padding: 0.3rem 0.6rem;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Choose Your Plan</h1>
+        
+        <div class="pricing-cards">
+            <!-- Free Plan -->
+            <div class="pricing-card">
+                <div class="plan-name">Free</div>
+                <div class="price"><span class="price-currency">₹</span>0</div>
+                <div class="price-period">/month</div>
+                
+                <ul class="features">
+                    <li>3 generations per month</li>
+                    <li>All formats available</li>
+                    <li>Basic customization</li>
+                    <li>No credit card needed</li>
+                </ul>
+                
+                <button class="pay-btn" onclick="alert('You\'re already on the free plan!')">
+                    Current Plan
+                </button>
+            </div>
+            
+            <!-- Starter Plan -->
+            <div class="pricing-card featured">
+                <div class="badge">POPULAR</div>
+                <div class="plan-name">Starter</div>
+                <div class="price"><span class="price-currency">₹</span>1,499</div>
+                <div class="price-period">/month</div>
+                
+                <ul class="features">
+                    <li>50 generations per month</li>
+                    <li>All formats & styles</li>
+                    <li>Advanced customization</li>
+                    <li>Priority support</li>
+                    <li>Save templates</li>
+                </ul>
+                
+                <button class="pay-btn" onclick="initiatePayment('starter', 1499)">
+                    Upgrade to Starter
+                </button>
+                
+                <div class="payment-methods">
+                    <div>Secure payment via Razorpay</div>
+                    <div class="method-icons">
+                        <span class="method-icon">UPI</span>
+                        <span class="method-icon">Cards</span>
+                        <span class="method-icon">Net Banking</span>
+                        <span class="method-icon">Wallets</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pro Plan -->
+            <div class="pricing-card">
+                <div class="plan-name">Pro</div>
+                <div class="price"><span class="price-currency">₹</span>2,999</div>
+                <div class="price-period">/month</div>
+                
+                <ul class="features">
+                    <li>Unlimited generations</li>
+                    <li>Everything in Starter</li>
+                    <li>Custom templates</li>
+                    <li>Analytics dashboard</li>
+                    <li>API access</li>
+                    <li>White-label option</li>
+                </ul>
+                
+                <button class="pay-btn" onclick="initiatePayment('pro', 2999)">
+                    Upgrade to Pro
+                </button>
+                
+                <div class="payment-methods">
+                    <div>Secure payment via Razorpay</div>
+                    <div class="method-icons">
+                        <span class="method-icon">UPI</span>
+                        <span class="method-icon">Cards</span>
+                        <span class="method-icon">Net Banking</span>
+                        <span class="method-icon">Wallets</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Razorpay Checkout Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    
+    <script>
+        async function initiatePayment(plan, amount) {
+            try {
+                // Get user email (you'd get this from session/login)
+                const email = prompt('Enter your email:') || 'customer@example.com';
+                
+                // Create order on your backend
+                const response = await fetch('http://localhost:3000/api/create-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: amount,
+                        plan: plan,
+                        email: email
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    alert('Error creating order: ' + data.error);
+                    return;
+                }
+                
+                // Open Razorpay Checkout
+                const options = {
+                    key: data.razorpayKeyId, // Your Razorpay Key ID
+                    amount: data.amount, // Amount in paise
+                    currency: data.currency,
+                    name: 'LinkedIn Generator',
+                    description: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan`,
+                    image: 'https://your-logo-url.com/logo.png', // Your logo
+                    order_id: data.orderId,
+                    
+                    // Success handler
+                    handler: async function (response) {
+                        // Verify payment on backend
+                        const verifyResponse = await fetch('http://localhost:3000/api/verify-payment', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                                email: email,
+                                plan: plan,
+                                amount: amount
+                            })
+                        });
+                        
+                        const verifyData = await verifyResponse.json();
+                        
+                        if (verifyData.success) {
+                            alert('🎉 Payment Successful! Your account has been upgraded to ' + plan + ' plan!');
+                            // Redirect to app or refresh page
+                            window.location.href = '/app.html';
+                        } else {
+                            alert('Payment verification failed. Please contact support.');
+                        }
+                    },
+                    
+                    // Payment modal settings
+                    prefill: {
+                        email: email,
+                        contact: '' // Can add phone number
+                    },
+                    theme: {
+                        color: '#667eea'
+                    },
+                    
+                    // Modal settings
+                    modal: {
+                        ondismiss: function() {
+                            alert('Payment cancelled. Feel free to try again when ready!');
+                        }
+                    }
+                };
+                
+                const rzp = new Razorpay(options);
+                rzp.open();
+                
+            } catch (error) {
+                console.error('Payment error:', error);
+                alert('Error initiating payment. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html>

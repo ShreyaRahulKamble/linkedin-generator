@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedInGenie – AI LinkedIn Posts That Go Viral</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue: #0A66C2;
+            --electric: #00C2FF;
+            --dark: #050D1A;
+            --card: #0D1B2E;
+            --text: #E8F0FE;
+            --muted: #7A9CC0;
+            --accent: #FFB800;
+            --glow: rgba(0, 194, 255, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* ─── ANIMATED BACKGROUND ─── */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 20% 20%, rgba(10,102,194,0.15) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 80%, rgba(0,194,255,0.1) 0%, transparent 50%);
+            animation: bgShift 8s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes bgShift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(2%, 2%); }
+        }
+
+        /* ─── GRID OVERLAY ─── */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(rgba(0,194,255,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0,194,255,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ─── NAVBAR ─── */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(20px);
+            background: rgba(5, 13, 26, 0.8);
+            border-bottom: 1px solid rgba(0,194,255,0.1);
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.4rem;
+            background: linear-gradient(135deg, #fff 0%, var(--electric) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo span { color: var(--electric); }
+
+        nav a {
+            color: var(--muted);
+            text-decoration: none;
+            margin: 0 1.2rem;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: white; }
+
+        .nav-cta {
+            background: linear-gradient(135deg, var(--blue), var(--electric));
+            color: white !important;
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: opacity 0.2s, transform 0.2s !important;
+        }
+        .nav-cta:hover { opacity: 0.9; transform: scale(1.05) !important; }
+
+        /* ─── HERO ─── */
+        .hero {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 8rem 2rem 4rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0,194,255,0.1);
+            border: 1px solid rgba(0,194,255,0.3);
+            color: var(--electric);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            margin-bottom: 2rem;
+            animation: fadeDown 0.6s ease;
+        }
+
+        .badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--electric);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes fadeDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2.8rem, 6vw, 5.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            animation: fadeUp 0.7s 0.1s both ease;
+        }
+
+        h1 .highlight {
+            background: linear-gradient(135deg, var(--electric), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--muted);
+            max-width: 560px;
+            line-height: 1.7;
+            margin-bottom: 2.5rem;
+            animation: fadeUp 0.7s 0.2s both ease;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeUp 0.7s 0.3s both ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--blue) 0%, var(--electric) 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 0 30px rgba(0,194,255,0.3);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(0,194,255,0.5); }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .btn-secondary:hover { border-color: var(--electric); background: rgba(0,194,255,0.05); }
+
+        /* ─── STATS BAR ─── */
+        .stats-bar {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            padding: 2rem;
+            margin: 0 auto 4rem;
+            max-width: 700px;
+            flex-wrap: wrap;
+        }
+
+        .stat { text-align: center; }
+        .stat-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, white, var(--electric));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-label { font-size: 0.85rem; color: var(--muted); margin-top: 0.2rem; }
+
+        /* ─── DEMO CARD ─── */
+        .demo-section {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+            margin: 0 auto 6rem;
+            padding: 0 2rem;
+        }
+
+        .demo-window {
+            background: var(--card);
+            border: 1px solid rgba(0,194,255,0.15);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 80px rgba(0,194,255,0.1), 0 40px 80px rgba(0,0,0,0.5);
+        }
+
+        .demo-topbar {
+            background: rgba(255,255,255,0.05);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #FF5F57; }
+        .dot.yellow { background: #FFBD2E; }
+        .dot.green { background: #28CA41; }
+
+        .demo-topbar-title {
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .demo-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .demo-input-side {
+            padding: 2rem;
+            border-right: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .demo-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            margin-bottom: 0.8rem;
+        }
+
+        .demo-input-box {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            color: var(--text);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1.2rem;
+        }
+
+        .demo-chips {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.2rem;
+        }
+
+        .chip {
+            background: rgba(0,194,255,0.1);
+            border: 1px solid rgba(0,194,255,0.2);
+            color: var(--electric);
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+        }
+
+        .demo-generate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--blue), var(--electric));
+            border: none;
+            color: white;
+            padding: 0.8rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .demo-output-side { padding: 2rem; }
+
+        .demo-post {
+            background: white;
+            border-radius: 12px;
+            padding: 1.2rem;
+            color: #1a1a1a;
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+
+        .demo-post-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--blue), var(--electric));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .poster-name { font-weight: 700; font-size: 0.9rem; }
+        .poster-role { font-size: 0.75rem; color: #666; }
+
+        .typing-effect {
+            overflow: hidden;
+            border-right: 2px solid var(--electric);
+            white-space: pre-wrap;
+            animation: typing 3s steps(120) 1s both, blink 0.5s step-end infinite alternate;
+        }
+
+        @keyframes blink { from { border-color: var(--electric); } to { border-color: transparent; } }
+
+        /* ─── FEATURES ─── */
+        .section {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 5rem 2rem;
+        }
+
+        .section-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--electric);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 4rem;
+            line-height: 1.2;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: var(--card);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: border-color 0.3s, transform 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--electric), transparent);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover::before { transform: scaleX(1); }
+        .feature-card:hover { border-color: rgba(0,194,255,0.2); transform: translateY(-4px); }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(0,194,255,0.1);
+            border: 1px solid rgba(0,194,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .feature-card h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+        }
+
+        .feature-card p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
+
+        /* ─── PRICING ─── */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .price-card {
+            background: var(--card);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 20px;
+            padding: 2.5rem;
+            position: relative;
+            transition: transform 0.3s;
+        }
+
+        .price-card:hover { transform: translateY(-5px); }
+
+        .price-card.popular {
+            border-color: var(--electric);
+            box-shadow: 0 0 40px rgba(0,194,255,0.15);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--blue), var(--electric));
+            color: white;
+            padding: 0.3rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .plan-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--muted);
+        }
+
+        .plan-price {
+            font-family: 'Syne', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 0.3rem;
+            line-height: 1;
+        }
+
+        .plan-price sup { font-size: 1.5rem; vertical-align: top; margin-top: 0.5rem; display: inline-block; }
+        .plan-period { font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem; }
+
+        .plan-features { list-style: none; margin-bottom: 2rem; }
+        .plan-features li {
+            padding: 0.6rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            color: var(--muted);
+        }
+        .plan-features li::before { content: '✓'; color: var(--electric); font-weight: 700; }
+
+        .plan-btn {
+            width: 100%;
+            padding: 0.9rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .plan-btn.filled {
+            background: linear-gradient(135deg, var(--blue), var(--electric));
+            color: white;
+            box-shadow: 0 0 20px rgba(0,194,255,0.3);
+        }
+        .plan-btn.filled:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(0,194,255,0.5); }
+        .plan-btn.outline { background: transparent; color: var(--text); border: 1px solid rgba(255,255,255,0.15); }
+        .plan-btn.outline:hover { border-color: var(--electric); }
+
+        /* ─── TESTIMONIALS ─── */
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .testimonial {
+            background: var(--card);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .stars { color: var(--accent); margin-bottom: 1rem; font-size: 1rem; }
+        .testimonial-text { font-size: 0.95rem; line-height: 1.7; color: var(--muted); margin-bottom: 1.5rem; font-style: italic; }
+        .testimonial-author { display: flex; align-items: center; gap: 0.8rem; }
+        .author-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--blue), #7C3AED);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 700;
+        }
+        .author-name { font-weight: 600; font-size: 0.9rem; }
+        .author-role { font-size: 0.8rem; color: var(--muted); }
+
+        /* ─── CTA SECTION ─── */
+        .cta-section {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 6rem 2rem;
+            overflow: hidden;
+        }
+
+        .cta-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0,194,255,0.12) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .cta-section h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .cta-section p { color: var(--muted); margin-bottom: 2.5rem; font-size: 1.1rem; position: relative; }
+
+        /* ─── FOOTER ─── */
+        footer {
+            position: relative;
+            z-index: 1;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 2rem;
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .demo-body { grid-template-columns: 1fr; }
+            .demo-input-side { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.05); }
+            nav .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+    <div class="logo">Linked<span>Genie</span> ✨</div>
+    <div class="nav-links">
+        <a href="#">Features</a>
+        <a href="#">Pricing</a>
+        <a href="#">Examples</a>
+    </div>
+    <a href="app.html" class="nav-cta">Start Free →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="badge">🚀 AI-Powered LinkedIn Content Generator</div>
+    <h1>Turn Any Idea Into<br>a <span class="highlight">Viral LinkedIn Post</span></h1>
+    <p class="subtitle">Generate scroll-stopping LinkedIn content in 10 seconds. Used by 10,000+ creators, founders, and professionals.</p>
+    <div class="hero-buttons">
+        <a href="app.html" class="btn-primary">⚡ Generate Free Post</a>
+        <a href="#demo" class="btn-secondary">See How It Works ↓</a>
+    </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+    <div class="stat">
+        <div class="stat-num">10K+</div>
+        <div class="stat-label">Active Users</div>
+    </div>
+    <div class="stat">
+        <div class="stat-num">500K+</div>
+        <div class="stat-label">Posts Generated</div>
+    </div>
+    <div class="stat">
+        <div class="stat-num">4.8★</div>
+        <div class="stat-label">Average Rating</div>
+    </div>
+    <div class="stat">
+        <div class="stat-num">10s</div>
+        <div class="stat-label">Per Post</div>
+    </div>
+</div>
+
+<!-- DEMO WINDOW -->
+<div class="demo-section" id="demo">
+    <div class="demo-window">
+        <div class="demo-topbar">
+            <div class="dot red"></div>
+            <div class="dot yellow"></div>
+            <div class="dot green"></div>
+            <div class="demo-topbar-title">LinkedInGenie — AI Content Studio</div>
+        </div>
+        <div class="demo-body">
+            <div class="demo-input-side">
+                <div class="demo-label">Your Topic</div>
+                <div class="demo-input-box">"How AI is replacing manual tasks in marketing"</div>
+                <div class="demo-label">Post Style</div>
+                <div class="demo-chips">
+                    <div class="chip" style="background:rgba(0,194,255,0.25)">✓ Storytelling</div>
+                    <div class="chip">How-To</div>
+                    <div class="chip">List</div>
+                    <div class="chip">Contrarian</div>
+                </div>
+                <div class="demo-label">Tone</div>
+                <div class="demo-chips">
+                    <div class="chip" style="background:rgba(0,194,255,0.25)">✓ Thought Leader</div>
+                    <div class="chip">Casual</div>
+                    <div class="chip">Inspiring</div>
+                </div>
+                <button class="demo-generate-btn">✨ Generate Post</button>
+            </div>
+            <div class="demo-output-side">
+                <div class="demo-label">Generated Post</div>
+                <div class="demo-post">
+                    <div class="demo-post-header">
+                        <div class="avatar">Y</div>
+                        <div>
+                            <div class="poster-name">You</div>
+                            <div class="poster-role">Your Title • 2nd</div>
+                        </div>
+                    </div>
+                    <p>🤖 AI isn't replacing marketers.<br><br>
+                    It's making the best ones <strong>10x faster</strong>.<br><br>
+                    Here's what changed in the last 90 days:<br><br>
+                    → 3-hour content plans now take 10 minutes<br>
+                    → A/B testing happens in hours, not weeks<br>
+                    → Personalization is now truly at scale<br><br>
+                    But here's what AI still can't replace:<br><br>
+                    <strong>Your unique perspective.</strong><br><br>
+                    The best marketing in 2024 = AI speed + Human insight.<br><br>
+                    What's your experience? 👇</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section">
+    <div class="section-label">What You Get</div>
+    <h2 class="section-title">Everything You Need to<br>Dominate LinkedIn</h2>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Instant Generation</h3>
+            <p>AI creates your perfectly crafted LinkedIn post in under 10 seconds. No staring at blank screens ever again.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>5 Post Formats</h3>
+            <p>Stories, how-to guides, lists, contrarian takes, or thought-provoking questions. Pick what fits your vibe.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🎨</div>
+            <h3>Your Voice, Amplified</h3>
+            <p>Choose from 4 tones: Professional, Casual, Thought Leader, or Inspiring. It always sounds like YOU.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Engagement Optimized</h3>
+            <p>Every post is trained to stop scrolls, get comments, and drive profile visits — built from 10,000+ viral posts.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <h3>Works Everywhere</h3>
+            <p>Browser-based, no downloads, works on phone, tablet, or desktop. Create on the go, anytime.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔁</div>
+            <h3>Unlimited Rewrites</h3>
+            <p>Don't like it? Regenerate instantly. Tweak the tone, change the format, get a completely fresh post.</p>
+        </div>
+    </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" style="padding-top: 0;">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">Simple, Honest Pricing</h2>
+    <div class="pricing-grid">
+        <div class="price-card">
+            <div class="plan-name">Free</div>
+            <div class="plan-price"><sup>₹</sup>0</div>
+            <div class="plan-period">Forever free</div>
+            <ul class="plan-features">
+                <li>3 posts per month</li>
+                <li>All 5 formats</li>
+                <li>Basic customization</li>
+                <li>No credit card needed</li>
+            </ul>
+            <a href="app.html" class="plan-btn outline">Get Started Free</a>
+        </div>
+        <div class="price-card popular">
+            <div class="popular-badge">⭐ MOST POPULAR</div>
+            <div class="plan-name">Starter</div>
+            <div class="plan-price"><sup>₹</sup>1,499</div>
+            <div class="plan-period">per month</div>
+            <ul class="plan-features">
+                <li>50 posts per month</li>
+                <li>All formats + tones</li>
+                <li>Advanced customization</li>
+                <li>Save templates</li>
+                <li>Priority generation</li>
+            </ul>
+            <a href="payment.html" class="plan-btn filled">Upgrade to Starter</a>
+        </div>
+        <div class="price-card">
+            <div class="plan-name">Pro</div>
+            <div class="plan-price"><sup>₹</sup>2,999</div>
+            <div class="plan-period">per month</div>
+            <ul class="plan-features">
+                <li>Unlimited posts</li>
+                <li>Everything in Starter</li>
+                <li>Custom templates</li>
+                <li>Analytics dashboard</li>
+                <li>API access</li>
+            </ul>
+            <a href="payment.html" class="plan-btn outline">Go Pro</a>
+        </div>
+    </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section" style="padding-top: 0;">
+    <div class="section-label">Loved By Creators</div>
+    <h2 class="section-title">Real People, Real Results</h2>
+    <div class="testimonials-grid">
+        <div class="testimonial">
+            <div class="stars">★★★★★</div>
+            <div class="testimonial-text">"I went from posting once a month to every day. LinkedInGenie saves me 3 hours every week and my engagement is up 400%."</div>
+            <div class="testimonial-author">
+                <div class="author-avatar">R</div>
+                <div>
+                    <div class="author-name">Rahul Sharma</div>
+                    <div class="author-role">Startup Founder, Mumbai</div>
+                </div>
+            </div>
+        </div>
+        <div class="testimonial">
+            <div class="stars">★★★★★</div>
+            <div class="testimonial-text">"As a consultant, my LinkedIn presence is everything. This tool makes me look like a full-time content creator with zero effort."</div>
+            <div class="testimonial-author">
+                <div class="author-avatar" style="background: linear-gradient(135deg, #7C3AED, #EC4899);">P</div>
+                <div>
+                    <div class="author-name">Priya Nair</div>
+                    <div class="author-role">Business Consultant, Bangalore</div>
+                </div>
+            </div>
+        </div>
+        <div class="testimonial">
+            <div class="stars">★★★★★</div>
+            <div class="testimonial-text">"The posts actually sound like me, not some robot. I've gotten 3 job offers through LinkedIn since I started using this."</div>
+            <div class="testimonial-author">
+                <div class="author-avatar" style="background: linear-gradient(135deg, #059669, #0891B2);">A</div>
+                <div>
+                    <div class="author-name">Arjun Mehta</div>
+                    <div class="author-role">Product Manager, Delhi</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+    <div class="cta-glow"></div>
+    <h2>Ready to Go Viral on LinkedIn?</h2>
+    <p>Join 10,000+ professionals posting better content in less time</p>
+    <a href="app.html" class="btn-primary" style="font-size: 1.1rem; padding: 1.2rem 3rem;">⚡ Start for Free — No Card Needed</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <p>© 2024 LinkedInGenie • Built with AI for content creators</p>
+    <p style="margin-top: 0.5rem;">
+        <a href="#" style="color: var(--muted); text-decoration: none; margin: 0 1rem;">Terms</a>
+        <a href="#" style="color: var(--muted); text-decoration: none; margin: 0 1rem;">Privacy</a>
+        <a href="#" style="color: var(--muted); text-decoration: none; margin: 0 1rem;">Contact</a>
+    </p>
+</footer>
+
+</body>
+</html>
