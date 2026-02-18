@@ -176,8 +176,8 @@ app.listen(PORT, () => {
     console.log('\n✅ LinkedIn Generator is RUNNING!');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log(`📝 Landing Page : https://linkedin-generator-production.up.railway.app/landing.html`);
-    console.log(`⚡ App          : http://linkedin-generator-production.up.railway.app/app.html`);
-    console.log(`💳 Payment Page : http://linkedin-generator-production.up.railway.app/payment.html`);
+    console.log(`⚡ App          : https://linkedin-generator-production.up.railway.app/app.html`);
+    console.log(`💳 Payment Page : https://linkedin-generator-production.up.railway.app/payment.html`);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('🤖 Using: Google Gemini AI (FREE)');
     console.log('💰 Payments: Razorpay\n');
