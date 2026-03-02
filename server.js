@@ -180,7 +180,7 @@ app.get('/', (req, res) => {
      });
 
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log('\n✅ LinkedIn Generator is RUNNING on port ${PORT}');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log(`📝 Landing Page : /landing.html`);

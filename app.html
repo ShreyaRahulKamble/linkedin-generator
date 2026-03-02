@@ -350,7 +350,7 @@
             document.getElementById('actionButtons').style.display = 'none';
             
             try {
-                const response = await fetch('http://localhost:3000/api/generate-linkedin', {
+                const response = await fetch('/api/generate-linkedin', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
