@@ -1,34 +1,13 @@
 const express = require('express');
-const admin = require('firebase-admin');
-const app = express();
-
-// Initialize Firebase Admin SDK
-// Render will use the environment variables configured below
-admin.initializeApp({
-  credential: admin.credential.cert({
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    // Replace newline characters in the private key
-    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-  }),
-});
-
-const db = admin.firestore(); // Your Firestore Database Instance
-const serviceAccount = require("./firebase-key.json"); // Path to your downloaded key file
-
-
-const path = require('path');
 const cors = require('cors');
 const https = require('https');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const fs = require('fs');
-const axios = require('axios');
-const cheerio = require('cheerio');
 require('dotenv').config();
 
-const PORT = process.env.PORT || 10000; 
-
+const app = express();
+const PORT = 3000;
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -53,7 +32,7 @@ function updateUser(email, data) {
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname)));
+app.use(express.static('.'));
 
 // Call Google Gemini API
 function callGemini(prompt) {
@@ -61,12 +40,12 @@ function callGemini(prompt) {
         const apiKey = process.env.GEMINI_API_KEY;
         const body = JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 2000, temperature: 0.8 }
+            generationConfig: { maxOutputTokens: 1000, temperature: 0.8 }
         });
 
         const options = {
             hostname: 'generativelanguage.googleapis.com',
-            path: `/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+            path: `/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -192,17 +171,13 @@ app.post('/api/verify-payment', async (req, res) => {
 app.get('/api/user/:email', (req, res) => {
     res.json({ success: true, user: getUser(req.params.email) });
 });
-app.get('/', (req, res) => {
-     res.sendFile(path.join(__dirname,'landing.html'));
-     });
 
-
-app.listen(PORT, '0.0.0.0', () => {
-    console.log('\n✅ LinkedIn Generator is RUNNING on port ${PORT}');
+app.listen(PORT, () => {
+    console.log('\n✅ LinkedIn Generator is RUNNING!');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log(`📝 Landing Page : /landing.html`);
-    console.log(`⚡ App          : /app.html`);
-    console.log(`💳 Payment Page : /payment.html`);
+    console.log(`📝 Landing Page : http://localhost:${PORT}/landing.html`);
+    console.log(`⚡ App          : http://localhost:${PORT}/app.html`);
+    console.log(`💳 Payment Page : http://localhost:${PORT}/payment.html`);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('🤖 Using: Google Gemini AI (FREE)');
     console.log('💰 Payments: Razorpay\n');
