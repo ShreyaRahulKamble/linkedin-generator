@@ -14,14 +14,11 @@ admin.initializeApp({
 });
 
 const db = admin.firestore(); // Your Firestore Database Instance
-const admin = require('firebase-admin');
 const serviceAccount = require('./firebase-key.json'); // Path to your downloaded key file
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
-
-const db = admin.firestore(); // This is your database instance
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
