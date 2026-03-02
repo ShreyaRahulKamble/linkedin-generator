@@ -16,10 +16,6 @@ admin.initializeApp({
 const db = admin.firestore(); // Your Firestore Database Instance
 const serviceAccount = require('./firebase-key.json'); // Path to your downloaded key file
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
-
 const path = require('path');
 const cors = require('cors');
 const https = require('https');
@@ -30,7 +26,6 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 require('dotenv').config();
 
-const app = express();
 const PORT = process.env.PORT || 10000; 
 
 
