@@ -19,7 +19,7 @@ const serviceAccount = require('./firebase-key.json'); // Path to your downloade
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
-const express = require('express');
+
 const path = require('path');
 const cors = require('cors');
 const https = require('https');
