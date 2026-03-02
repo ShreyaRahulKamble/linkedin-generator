@@ -36,7 +36,7 @@ function updateUser(email, data) {
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('__dirname'));
+app.use(express.static(path.join(__dirname)));
 
 // Call Google Gemini API
 function callGemini(prompt) {
