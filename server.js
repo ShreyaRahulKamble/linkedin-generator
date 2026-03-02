@@ -14,7 +14,8 @@ admin.initializeApp({
 });
 
 const db = admin.firestore(); // Your Firestore Database Instance
-const serviceAccount = require('./firebase-key.json'); // Path to your downloaded key file
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT); // Path to your downloaded key file
+
 
 const path = require('path');
 const cors = require('cors');
