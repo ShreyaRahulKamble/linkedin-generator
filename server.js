@@ -1,13 +1,17 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const https = require('https');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const fs = require('fs');
+const axios = require('axios');
+const cheerio = require('cheerio');
 require('dotenv').config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 10000; 
+
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -32,7 +36,7 @@ function updateUser(email, data) {
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('.'));
+app.use(express.static('__dirname'));
 
 // Call Google Gemini API
 function callGemini(prompt) {
@@ -40,12 +44,12 @@ function callGemini(prompt) {
         const apiKey = process.env.GEMINI_API_KEY;
         const body = JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 1000, temperature: 0.8 }
+            generationConfig: { maxOutputTokens: 2000, temperature: 0.8 }
         });
 
         const options = {
             hostname: 'generativelanguage.googleapis.com',
-            path: `/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+            path: `/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -173,11 +177,11 @@ app.get('/api/user/:email', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log('\n✅ LinkedIn Generator is RUNNING!');
+    console.log('\n✅ LinkedIn Generator is RUNNING on port ${PORT}');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log(`📝 Landing Page : http://localhost:${PORT}/landing.html`);
-    console.log(`⚡ App          : http://localhost:${PORT}/app.html`);
-    console.log(`💳 Payment Page : http://localhost:${PORT}/payment.html`);
+    console.log(`📝 Landing Page : /landing.html`);
+    console.log(`⚡ App          : /app.html`);
+    console.log(`💳 Payment Page : /payment.html`);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('🤖 Using: Google Gemini AI (FREE)');
     console.log('💰 Payments: Razorpay\n');
