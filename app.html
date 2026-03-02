@@ -316,9 +316,7 @@
     </div>
 
     <script>
-        if (localStorage.getItem('user_credits') !== null &&               parseInt(localStorage.getItem('user_credits')) <= 0) {
-    window.location.href = "upgrade.html"; // Immediate redirect
-        }
+       
         let userCredits = 3;
         let userPlan = 'free'; // free, starter, pro
         
@@ -374,25 +372,7 @@
                     document.getElementById('output').textContent = data.content;
                     document.getElementById('output').classList.remove('empty');
                     document.getElementById('actionButtons').style.display = 'flex';
-           // Check if user has a saved credit count, otherwise start with 3
-           let credits = localStorage.getItem('user_credits');
-
-           if (credits === null) {
-               credits = 3; // First time user
-               localStorage.setItem('user_credits', credits);
-           } else {
-               credits = parseInt(credits); // Convert string back to number
-           }
-
-          // Function to check and update UI
-          function updateCreditUI() {
-              if (credits <= 0) {
-                  // REDIRECT TO UPGRADE PAGE
-                  window.location.href = "upgrade.html"; 
-              }
-              document.getElementById('credit-count').innerText = credits;
-          }
-                    
+           
                     // Decrease credits
                     userCredits--;
                     updateCredits();
@@ -429,6 +409,43 @@
             document.getElementById('actionButtons').style.display = 'none';
         }
         
+        // 1. Function to handle the button click
+        async function handleGenerateClick() {
+            const email = document.getElementById('userEmail').value;
+            
+            if (!email) {
+                alert("Please enter your email.");
+                return;
+            }
+
+            document.getElementById('loading').innerText = "Generating...";
+
+            // 2. Call your backend server
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+
+                const data = await response.json();
+
+                // 3. Check if credits are exhausted (HTTP 403)
+                if (response.status === 403) {
+                    alert("Free credits exhausted. Redirecting to payment page.");
+                    window.location.href = "payment.html"; // Redirects to your pricing page
+                    return;
+                }
+
+                // Display generated content
+                alert("Post generated: " + data.content);
+                document.getElementById('loading').innerText = "";
+
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('loading').innerText = "An error occurred.";
+            }
+        }
         // Show pricing modal (placeholder)
         function showPricing() {
             alert('Upgrade options:\n\nStarter: $19/month - 50 posts\nPro: $39/month - Unlimited\n\nVisit billing page to upgrade!');

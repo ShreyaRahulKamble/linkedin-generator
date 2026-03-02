@@ -1,4 +1,28 @@
 const express = require('express');
+const admin = require('firebase-admin');
+const app = express();
+
+// Initialize Firebase Admin SDK
+// Render will use the environment variables configured below
+admin.initializeApp({
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    // Replace newline characters in the private key
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+  }),
+});
+
+const db = admin.firestore(); // Your Firestore Database Instance
+const admin = require('firebase-admin');
+const serviceAccount = require('./firebase-key.json'); // Path to your downloaded key file
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+const db = admin.firestore(); // This is your database instance
+const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const https = require('https');
