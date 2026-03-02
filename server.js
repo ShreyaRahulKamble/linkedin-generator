@@ -175,6 +175,10 @@ app.post('/api/verify-payment', async (req, res) => {
 app.get('/api/user/:email', (req, res) => {
     res.json({ success: true, user: getUser(req.params.email) });
 });
+app.get('/', (req, res) => {
+     res.sendFile(path.join(__dirname,'landing.html'));
+     });
+
 
 app.listen(PORT, () => {
     console.log('\n✅ LinkedIn Generator is RUNNING on port ${PORT}');
