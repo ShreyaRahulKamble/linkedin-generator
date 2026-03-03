@@ -624,7 +624,7 @@
         <a href="#">Pricing</a>
         <a href="#">Examples</a>
     </div>
-    <a href="#" id="nav-start-free" class="nav-cta">Start Free →</a>
+    <button id="nav-start-free" class="nav-cta">Start Free →</a>
 </nav>
 
 <!-- HERO -->
@@ -633,8 +633,8 @@
     <h1>Turn Any Idea Into<br>a <span class="highlight">Viral LinkedIn Post</span></h1>
     <p class="subtitle">Generate scroll-stopping LinkedIn content in 10 seconds. Used by 10,000+ creators, founders, and professionals.</p>
     <div class="hero-buttons">
-        <a href="#" id="generate-btn" class="btn-primary">⚡ Generate Free Post</a>
-        <a href="#demo" class="btn-secondary">See How It Works ↓</a>
+        <button id="generate-btn" class="btn-primary">⚡ Generate Free Post</a>
+        <button id="start-now-btn" class="btn-secondary">See How It Works ↓</a>
     </div>
 </section>
 
@@ -878,7 +878,11 @@
 
   // Target the button from your UI
   // Note: Ensure your button has id="generate-btn" or update the selector below
-  const generateBtn = document.getElementById('generate-btn');
+  const buttons = [
+     document.getElementById('generate-btn');
+     document.getElementById('start-now-btn');
+  ]
+
   
   generateBtn.addEventListener('click', async () => {
     try {
