@@ -1,0 +1,155 @@
+[33mcommit 875c316731447cff3bc826586d2266dce5fcc282[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: ShreyaRahulKamble <shreyark1121@gmail.com>
+Date:   Tue Mar 3 11:43:12 2026 +0530
+
+    Create README.md
+
+[33mcommit 426a2be76f34c6f479bf3be446bdb775aee6452f[m
+Author: ShreyaRahulKamble <shreyark1121@gmail.com>
+Date:   Tue Mar 3 11:19:31 2026 +0530
+
+    Create SECURITY.md
+
+[33mcommit 2bbf006281c99ea8f4f956a5046c738f65441c87[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Tue Mar 3 02:15:27 2026 +0530
+
+    Add project files
+
+[33mcommit 69682b13701701d840329b49cb6d09dfda0f77e3[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Tue Mar 3 00:06:11 2026 +0530
+
+    Remove firebase key and add to gitignore
+
+[33mcommit e75fab5dfd3e9a91c07ea0779e851fb0e11af8f4[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Mon Mar 2 23:53:40 2026 +0530
+
+    Initial commit: LinkedIn Generator project files
+
+[33mcommit 98a60c4ff39c26062165191ed4f6e19e68092905[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Mon Mar 2 23:43:22 2026 +0530
+
+    Initial commit: LinkedIn Generator project files
+
+[33mcommit a65d40ead057eab238bcf0b0b934231287315413[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Mon Mar 2 23:11:35 2026 +0530
+
+    Update server.js file
+
+[33mcommit 2b0a70d5a08c37bad8052fdf60d9d0ca95eaab93[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Mon Mar 2 22:29:52 2026 +0530
+
+    Update server.js file
+
+[33mcommit 84f232d629bd110a970cab8afa7230921a7852a7[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Mon Mar 2 22:16:07 2026 +0530
+
+    Add firebase-admin dependency
+
+[33mcommit 87f44ddf3518f5a153b7ec4c2111b18baf7ed994[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Mon Mar 2 22:05:24 2026 +0530
+
+    Update server.js file
+
+[33mcommit 4e7ec27efb2bae7e30230a141964a6f611aaee07[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Mon Mar 2 22:01:12 2026 +0530
+
+    Update server.js file
+
+[33mcommit aded63f0b102f47fa8240aca7d6d919d6f78f78e[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Mon Mar 2 21:54:34 2026 +0530
+
+    Update server.js file
+
+[33mcommit f02a22d9e3260be4056c88633d0a585bb4fba69b[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Mon Mar 2 20:00:09 2026 +0530
+
+    Update three files
+
+[33mcommit ecbd56bc1679e65642fb7b59cf4f5571a4773424[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Mon Mar 2 18:47:16 2026 +0530
+
+    Update gemini API Key
+
+[33mcommit c0611ab737d9a48f5de57d4b37b4d154a187b8f4[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Mon Mar 2 18:39:15 2026 +0530
+
+    Update app.html file
+
+[33mcommit bac29a7326694fd1ca4fb04b47f112eb745d61ac[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Mon Mar 2 16:53:11 2026 +0530
+
+    Update server.js app.html landing.html files
+
+[33mcommit 3b521c9328642e61c2137d0f3317bd43689bc523[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Mon Mar 2 16:19:08 2026 +0530
+
+    Update server.js file
+
+[33mcommit 88e0ccb263f614d6b1d897efb9ccaed6c597ef29[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Mon Mar 2 15:49:55 2026 +0530
+
+    Update server.js file
+
+[33mcommit 50ce441651679a17bc8e02cee35a0fcd146edcc2[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Mon Mar 2 15:38:03 2026 +0530
+
+    Fix: Add missing cheerio dependency
+
+[33mcommit 478bf73e81564735a4f9160020d11520c06b6c6e[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Mon Mar 2 15:20:03 2026 +0530
+
+    Update server.js file
+
+[33mcommit 12c951741106019874ad73e11f39a9b6c43f117f[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Mon Mar 2 14:52:35 2026 +0530
+
+    Initial commit: LinkedIn Generator project files
+
+[33mcommit 6c306a334e51d6b52637f27a52d21fda4a895acb[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Thu Feb 19 11:45:59 2026 +0530
+
+    Fix typo: change _dirname to __dirname
+
+[33mcommit 11e1388a6bdacb927ff7d8877ec98456c6de3ed6[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Wed Feb 18 22:19:51 2026 +0530
+
+    fixed railway port issue
+
+[33mcommit 4958907806531cf8f8c67bb8ee8305abc9f6a857[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Wed Feb 18 20:00:50 2026 +0530
+
+    fixed railway port issue
+
+[33mcommit 4bd768ba86199aa4ad589e88169de604f737dabb[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Wed Feb 18 15:11:30 2026 +0530
+
+    add Procfile
+
+[33mcommit e319d0a3848326b84e0ef3c2da94cb1ac96febfd[m
+Author: Shreya Rahul Kamble <shreyark1121@gmail.com>
+Date:   Tue Feb 17 18:56:43 2026 +0530
+
+    launch
