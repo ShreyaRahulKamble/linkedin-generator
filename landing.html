@@ -624,7 +624,7 @@
         <a href="#">Pricing</a>
         <a href="#">Examples</a>
     </div>
-    <a href="app.html" class="nav-cta">Start Free →</a>
+    <a href="#" id="nav-start-free" class="nav-cta">Start Free →</a>
 </nav>
 
 <!-- HERO -->
@@ -633,7 +633,7 @@
     <h1>Turn Any Idea Into<br>a <span class="highlight">Viral LinkedIn Post</span></h1>
     <p class="subtitle">Generate scroll-stopping LinkedIn content in 10 seconds. Used by 10,000+ creators, founders, and professionals.</p>
     <div class="hero-buttons">
-        <a href="app.html" class="btn-primary">⚡ Generate Free Post</a>
+        <a href="#" id="generate-btn" class="btn-primary">⚡ Generate Free Post</a>
         <a href="#demo" class="btn-secondary">See How It Works ↓</a>
     </div>
 </section>
@@ -855,6 +855,61 @@
         <a href="#" style="color: var(--muted); text-decoration: none; margin: 0 1rem;">Contact</a>
     </p>
 </footer>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // PASTE YOUR FIREBASE CONFIG HERE
+  const firebaseConfig = {
+    apiKey: "AIzaSyBsGTYy48QfPbWce0g1Qkyddy2ZYUJYN1E",
+    authDomain: "linkedin-generator-442a3.firebaseapp.com",
+    projectId: "linkedin-generator-442a3",
+    storageBucket: "linkedin-generator-442a3.firebasestorage.app",
+    messagingSenderId: "998246967538",
+    appId: "1:998246967538:web:45ebe162de086fc4c6c86b"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const provider = new GoogleAuthProvider();
+
+  // Target the button from your UI
+  // Note: Ensure your button has id="generate-btn" or update the selector below
+  const generateBtn = document.querySelector('button') || document.getElementById('generate-btn');
+  
+  generateBtn.addEventListener('click', async () => {
+    try {
+      // 1. Trigger the Google Login Pop-up
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // 2. Reference the user in Firestore
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      // 3. If it's a new user, give them 3 credits
+      if (!userSnap.exists()) {
+        await setDoc(userRef, {
+          email: user.email,
+          displayName: user.displayName,
+          credits: 3,
+          createdAt: new Date()
+        });
+        console.log("New user created with 3 credits.");
+      }
+
+      // 4. Send them to the app
+      window.location.href = "app.html";
+
+    } catch (error) {
+      console.error("Authentication failed:", error.code, error.message);
+      alert("Sign-in failed. Please try again.");
+    }
+  });
+</script>
 
 </body>
 </html>
