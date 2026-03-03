@@ -903,11 +903,11 @@
 
       // 4. Send them to the app
       window.location.href = "app.html";
-
-    } catch (error) {
-      console.error("Authentication failed:", error.code, error.message);
-      alert("Sign-in failed. Please try again.");
-    }
+} catch (error) {
+  // This will show the real technical reason in the popup
+  console.error("Full Error:", error);
+  alert("Technical Error: " + error.code + "\nMessage: " + error.message);
+}
   });
 </script>
 
