@@ -233,7 +233,7 @@
             
             <div id="upgradeBanner" class="upgrade-banner" style="display: none;">
                 <p><strong>Out of credits!</strong> Upgrade to continue creating content.</p>
-                <button class="upgrade-btn" onclick="showPricing()">Upgrade Now</button>
+                <button class="upgrade-btn" onclick="redirectToPayment()">Upgrade Now</button>
             </div>
             
             <form id="generateForm">
@@ -336,7 +336,7 @@ auth.onAuthStateChanged((user) => {
                 }
             } else {
                 // If new user, create their first 5 credits
-                db.collection("users").doc(user.uid).set({ credits: 5 });
+                db.collection("users").doc(user.uid).set({ credits: 3 });
             }
         });
     } else {
@@ -435,9 +435,11 @@ auth.onAuthStateChanged((user) => {
         }
         
         // Show pricing modal (placeholder)
-        function showPricing() {
-            alert('Upgrade options:\n\nStarter: $19/month - 50 posts\nPro: $39/month - Unlimited\n\nVisit billing page to upgrade!');
+        function redirectToPayment() {
+            // Redirect to a Stripe Payment Link or your custom checkout page
+    window.location.href = "payment.html";
         }
+            
         
         // Initialize
         updateCredits();

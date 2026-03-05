@@ -80,12 +80,16 @@ function callGemini(prompt) {
 // Generate LinkedIn Post
 app.post('/api/generate-linkedin', async (req, res) => {
     try {
+        const userId = req.body.userId; // Send this from app.html
         const { topic, format, tone, length, emojis, email } = req.body;
 
         const user = getUser(email || 'guest');
-        if (user.plan === 'free' && user.credits <= 0) {
-            return res.json({ success: false, error: 'No credits left. Please upgrade!' });
-        }
+        // 1. Check credits in Firestore first
+    const userRef = db.collection('users').doc(userId);
+    const userDoc = await userRef.get();
+        if (userDoc.data().credits <= 0) {
+        return res.status(403).send("Out of credits! Please upgrade.");
+    }
 
         const formats = {
             story: 'Write as a personal story with a hook, tension, and lesson.',
@@ -116,14 +120,14 @@ Generate ONLY the LinkedIn post, nothing else:`;
 
         const content = await callGemini(prompt);
 
-        if (user.plan === 'free' && email) {
-            updateUser(email, { credits: user.credits - 1 });
-        }
+        // 3. Subtract 1 credit ONLY after successful AI generation
+    await userRef.update({
+        credits: admin.firestore.FieldValue.increment(-1)
+    });
 
         res.json({
             success: true,
             content: content.trim(),
-            creditsRemaining: user.plan === 'free' ? user.credits - 1 : 999
         });
 
     } catch (error) {
