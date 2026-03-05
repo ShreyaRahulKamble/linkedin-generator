@@ -415,6 +415,23 @@
         
         // Initialize
         updateCredits();
+        // Listen for Auth changes, then fetch Firestore data
+auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        // Fetch credits in real-time
+        db.collection("users").doc(user.uid).onSnapshot((doc) => {
+            const userData = doc.data();
+            document.getElementById("credit-display").innerText = `${userData.credits} Credits Remaining`;
+            
+            // Global check for UI
+            if (userData.credits <= 0) {
+                disableGenerateButton(); 
+            }
+        });
+    } else {
+        window.location.href = "landing.html";
+    }
+});
     </script>
 </body>
 </html>
