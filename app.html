@@ -316,7 +316,33 @@
     </div>
 
     <script>
-        let userCredits = 3;
+        // 1. Initialize Firebase (Ensure your config is here)
+const db = firebase.firestore();
+
+// 2. Listen for the user and their credits
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        // This 'onSnapshot' makes sure if credits change in DB, 
+        // they update on your screen instantly without refresh!
+        db.collection("users").doc(user.uid).onSnapshot((doc) => {
+            if (doc.exists) {
+                const userCredits = doc.data().credits;
+                document.getElementById("credit-count").innerText = userCredits;
+                
+                // If 0, disable the button and show "Upgrade"
+                if (userCredits <= 0) {
+                    document.getElementById("generate-btn").disabled = true;
+                    document.getElementById("upgrade-link").style.display = "block";
+                }
+            } else {
+                // If new user, create their first 5 credits
+                db.collection("users").doc(user.uid).set({ credits: 5 });
+            }
+        });
+    } else {
+        window.location.href = "landing.html"; // Redirect if not logged in
+    }
+});
         let userPlan = 'free'; // free, starter, pro
         
         // Update credit display
