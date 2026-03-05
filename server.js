@@ -128,6 +128,7 @@ Generate ONLY the LinkedIn post, nothing else:`;
         res.json({
             success: true,
             content: content.trim(),
+            creditsRemaining: user.plan === 'free' ? user.credits - 1 : 999
         });
 
     } catch (error) {
