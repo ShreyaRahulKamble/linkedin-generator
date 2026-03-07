@@ -316,44 +316,8 @@
     </div>
 
     <script>
-        // 1. Initialize Firebase (Ensure your config is here)
-const db = firebase.firestore();
-
-// 2. Listen for the user and their credits
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        // This 'onSnapshot' makes sure if credits change in DB, 
-        // they update on your screen instantly without refresh!
-        db.collection("users").doc(user.uid).onSnapshot((doc) => {
-            if (doc.exists) {
-                const userCredits = doc.data().credits;
-                document.getElementById("credit-count").innerText = userCredits;
-                
-                // If 0, disable the button and show "Upgrade"
-                if (userCredits <= 0) {
-                    document.getElementById("generate-btn").disabled = true;
-                    document.getElementById("upgrade-link").style.display = "block";
-                }
-            } else {
-                // If new user, create their first 5 credits
-                db.collection("users").doc(user.uid).set({ credits: 3 });
-            }
-        });
-    } else {
-        window.location.href = "landing.html"; // Redirect if not logged in
-    }
-});
+        const db = firebase.firestore();
         let userPlan = 'free'; // free, starter, pro
-        
-        // Update credit display
-        function updateCredits() {
-            document.getElementById('creditCount').textContent = userCredits;
-            
-            if (userCredits <= 0) {
-                document.getElementById('upgradeBanner').style.display = 'block';
-                document.getElementById('generateBtn').disabled = true;
-            }
-        }
         
         // Handle form submission
         document.getElementById('generateForm').addEventListener('submit', async (e) => {
@@ -438,26 +402,36 @@ auth.onAuthStateChanged((user) => {
         function redirectToPayment() {
             // Redirect to a Stripe Payment Link or your custom checkout page
     window.location.href = "payment.html";
-        }
             
+        }
         
         // Initialize
         updateCredits();
-        // Listen for Auth changes, then fetch Firestore data
-auth.onAuthStateChanged(async (user) => {
+        // 1. Initialize Firebase (Ensure your config is here)
+
+
+// 2. Listen for the user and their credits
+auth.onAuthStateChanged((user) => {
     if (user) {
-        // Fetch credits in real-time
+        // This 'onSnapshot' makes sure if credits change in DB, 
+        // they update on your screen instantly without refresh!
         db.collection("users").doc(user.uid).onSnapshot((doc) => {
-            const userData = doc.data();
-            document.getElementById("credit-display").innerText = `${userData.credits} Credits Remaining`;
-            
-            // Global check for UI
-            if (userData.credits <= 0) {
-                disableGenerateButton(); 
+            if (doc.exists) {
+                const userCredits = doc.data().credits;
+                document.getElementById("credit-count").innerText = userCredits;
+                
+                // If 0, disable the button and show "Upgrade"
+                if (userCredits <= 0) {
+                    document.getElementById("generate-btn").disabled = true;
+                    document.getElementById("upgrade-btn").style.display = "block";
+                }
+            } else {
+                // If new user, create their first 5 credits
+                db.collection("users").doc(user.uid).set({ credits: 3 });
             }
         });
     } else {
-        window.location.href = "landing.html";
+        window.location.href = "landing.html"; // Redirect if not logged in
     }
 });
     </script>
