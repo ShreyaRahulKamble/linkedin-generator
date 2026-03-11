@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Post Generator - Create Viral Content</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        /* Auth Modal */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-modal.active { display: flex; }
+        
+        .auth-box {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .auth-box h2 {
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+        
+        .auth-input {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .auth-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+        }
+        .auth-btn:hover { background: #5568d3; }
+        
+        .auth-switch {
+            text-align: center;
+            margin-top: 1rem;
+            color: #666;
+        }
+        .auth-switch a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: none;
+        }
+        .container.active { display: block; }
+        
+        .header {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 1.8rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .credits-badge {
+            background: #f0f4ff;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .logout-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        .input-section, .output-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 600;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1.2rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .generate-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .generate-btn:hover { transform: translateY(-2px); }
+        .generate-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .output-box {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            min-height: 300px;
+            white-space: pre-wrap;
+            line-height: 1.8;
+            color: #333;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .output-box.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+        }
+        
+        .copy-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        .copy-btn:hover { background: #059669; }
+        
+        .loading {
+            text-align: center;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .upgrade-notice {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .upgrade-btn {
+            background: #ffc107;
+            color: #333;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content { grid-template-columns: 1fr; }
+        }
+
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0.9rem 1.5rem;
+            background: white;
+            color: #444;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: box-shadow 0.2s, border-color 0.2s;
+        }
+        .google-btn:hover {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            border-color: #aaa;
+        }
+        .google-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Auth Modal -->
+<div class="auth-modal active" id="authModal">
+    <div class="auth-box" style="text-align:center;">
+        <div style="font-size:2.5rem; margin-bottom:1rem;">✨</div>
+        <h2 style="margin-bottom:0.5rem;">LinkedIn Post Generator</h2>
+        <p style="color:#888; margin-bottom:2rem;">Sign in to start creating viral posts</p>
+
+        <button id="googleBtn" onclick="handleGoogleLogin()" class="google-btn">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" style="vertical-align:middle; margin-right:10px;">
+            Sign in with Google
+        </button>
+
+        <div id="authError" class="error" style="display:none; margin-top:1rem;"></div>
+    </div>
+</div>
+
+<!-- Main App -->
+<div class="container" id="mainApp">
+    <div class="header">
+        <h1>✨ LinkedIn Post Generator</h1>
+        <div class="user-info">
+            <span class="credits-badge" id="creditsDisplay">Credits: -</span>
+            <span id="userEmail"></span>
+            <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        </div>
+    </div>
+
+    <div id="upgradeNotice" style="display: none;" class="upgrade-notice">
+        <strong>⚠️ No credits remaining!</strong>
+        <button class="upgrade-btn" onclick="window.location.href='payment.html'">Upgrade Plan</button>
+    </div>
+
+    <div class="main-content">
+        <div class="input-section">
+            <h2>Create Your Post</h2>
+            
+            <label>Topic / Main Idea</label>
+            <textarea id="topic" placeholder="E.g., How AI is transforming customer service"></textarea>
+            
+            <label>Post Format</label>
+            <select id="format">
+                <option value="story">Story / Personal Experience</option>
+                <option value="howto">How-To Guide</option>
+                <option value="list">List / Tips</option>
+                <option value="contrarian">Contrarian / Hot Take</option>
+                <option value="question">Thought-Provoking Question</option>
+            </select>
+            
+            <label>Tone</label>
+            <select id="tone">
+                <option value="professional">Professional</option>
+                <option value="casual">Casual</option>
+                <option value="thought-leader">Thought Leader</option>
+                <option value="inspiring">Inspiring</option>
+            </select>
+            
+            <label>Length</label>
+            <select id="length">
+                <option value="short">Short (100-150 words)</option>
+                <option value="medium">Medium (150-250 words)</option>
+                <option value="long">Long (250-400 words)</option>
+            </select>
+            
+            <label>
+                <input type="checkbox" id="emojis" checked> Include Emojis
+            </label>
+            
+            <button class="generate-btn" id="generateBtn" onclick="generatePost()">
+                ✨ Generate Post
+            </button>
+        </div>
+        
+        <div class="output-section">
+            <h2>Generated Post</h2>
+            <div class="output-box empty" id="output">
+                Your generated post will appear here...
+            </div>
+            <button class="copy-btn" id="copyBtn" onclick="copyToClipboard()" style="display: none;">
+                📋 Copy to Clipboard
+            </button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    let currentUser = null;
+    let userData = null;
+
+    const FIREBASE_VERSION = '10.7.1';
+    const BASE = `https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}`;
+
+    function showError(msg) {
+        const el = document.getElementById('authError');
+        el.textContent = msg;
+        el.style.display = 'block';
+    }
+
+    // ── Google Sign-In ──────────────────────────────────────────────
+    async function handleGoogleLogin() {
+        const btn = document.getElementById('googleBtn');
+        btn.disabled = true;
+        btn.innerHTML = '⏳ Signing in...';
+
+        try {
+            const { getAuth, GoogleAuthProvider, signInWithPopup } =
+                await import(`${BASE}/firebase-auth.js`);
+            const { initializeApp, getApps } =
+                await import(`${BASE}/firebase-app.js`);
+            const { getFirestore, doc, getDoc, setDoc } =
+                await import(`${BASE}/firebase-firestore.js`);
+
+            // Read your existing firebase config
+            const fb = await import('./firebase-config.js');
+            const auth = fb.auth;
+            const db   = fb.db;
+
+            const provider = new GoogleAuthProvider();
+            const result   = await signInWithPopup(auth, provider);
+            const user     = result.user;
+
+            // Create user doc in Firestore if first time
+            const userRef  = doc(db, 'users', user.uid);
+            const userSnap = await getDoc(userRef);
+            if (!userSnap.exists()) {
+                await setDoc(userRef, {
+                    email:     user.email,
+                    name:      user.displayName,
+                    plan:      'free',
+                    credits:   3,
+                    createdAt: new Date().toISOString()
+                });
+            }
+            // onAuthStateChanged will fire and show the main app
+        } catch (err) {
+            showError('Google sign-in failed: ' + err.message);
+            btn.disabled = false;
+            btn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" style="vertical-align:middle;margin-right:10px;"> Sign in with Google';
+        }
+    }
+
+    // ── Logout ──────────────────────────────────────────────────────
+    async function handleLogout() {
+        const fb = await import('./firebase-config.js');
+        await fb.logoutUser();
+        currentUser = null;
+        userData    = null;
+    }
+
+    // ── Credits display ─────────────────────────────────────────────
+    function updateCreditsDisplay() {
+        const creditsEl     = document.getElementById('creditsDisplay');
+        const upgradeNotice = document.getElementById('upgradeNotice');
+        const generateBtn   = document.getElementById('generateBtn');
+
+        if (userData.plan === 'free') {
+            creditsEl.textContent = `Credits: ${userData.credits}/3`;
+            if (userData.credits <= 0) {
+                upgradeNotice.style.display = 'block';
+                generateBtn.disabled = true;
+            }
+        } else if (userData.plan === 'starter') {
+            creditsEl.textContent = `Credits: ${userData.credits}/50`;
+        } else {
+            creditsEl.textContent = 'Unlimited Credits';
+        }
+    }
+
+    // ── Generate post ────────────────────────────────────────────────
+    async function generatePost() {
+        if (!currentUser || !userData) return alert('Please log in first');
+        if (userData.plan === 'free' && userData.credits <= 0) {
+            alert('No credits remaining! Please upgrade your plan.');
+            window.location.href = 'payment.html';
+            return;
+        }
+
+        const topic = document.getElementById('topic').value.trim();
+        if (!topic) return alert('Please enter a topic');
+
+        const fb      = await import('./firebase-config.js');
+        const btn     = document.getElementById('generateBtn');
+        const output  = document.getElementById('output');
+        const copyBtn = document.getElementById('copyBtn');
+
+        btn.disabled    = true;
+        btn.textContent = '⏳ Generating...';
+        output.innerHTML = '<div class="loading">✨ Creating your viral post...</div>';
+        output.classList.remove('empty');
+        copyBtn.style.display = 'none';
+
+        try {
+            const response = await fetch('/api/generate-linkedin', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    topic,
+                    format:  document.getElementById('format').value,
+                    tone:    document.getElementById('tone').value,
+                    length:  document.getElementById('length').value,
+                    emojis:  document.getElementById('emojis').checked,
+                    userId:  currentUser.uid
+                })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                output.textContent    = data.content;
+                copyBtn.style.display = 'block';
+                if (userData.plan === 'free') {
+                    userData.credits = data.creditsRemaining;
+                    await fb.updateUserCredits(currentUser.uid, userData.credits);
+                    updateCreditsDisplay();
+                }
+            } else {
+                output.innerHTML = `<div class="error">${data.error}</div>`;
+            }
+        } catch (err) {
+            output.innerHTML = `<div class="error">Error: ${err.message}</div>`;
+        } finally {
+            btn.disabled    = false;
+            btn.textContent = '✨ Generate Post';
+        }
+    }
+
+    function copyToClipboard() {
+        navigator.clipboard.writeText(document.getElementById('output').textContent);
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = '✅ Copied!';
+        setTimeout(() => btn.textContent = '📋 Copy to Clipboard', 2000);
+    }
+
+    // ── Auth state listener ─────────────────────────────────────────
+    window.addEventListener('load', async () => {
+        try {
+            const fb = await import('./firebase-config.js');
+            const { onAuthStateChanged } = await import(`${BASE}/firebase-auth.js`);
+
+            onAuthStateChanged(fb.auth, async (user) => {
+                if (user) {
+                    currentUser = user;
+                    const result = await fb.getUserData(user.uid);
+                    if (result.success) {
+                        userData = result.data;
+                        document.getElementById('authModal').classList.remove('active');
+                        document.getElementById('mainApp').classList.add('active');
+                        document.getElementById('userEmail').textContent = user.displayName || user.email;
+                        updateCreditsDisplay();
+                    }
+                } else {
+                    document.getElementById('authModal').classList.add('active');
+                    document.getElementById('mainApp').classList.remove('active');
+                }
+            });
+        } catch (err) {
+            showError('Firebase failed to load: ' + err.message);
+        }
+    });
+</script>
+
+</body>
+</html>

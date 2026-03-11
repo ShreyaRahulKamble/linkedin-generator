@@ -1,0 +1,237 @@
+const express = require('express');
+const path = require('path');
+const cors = require('cors');
+const https = require('https');
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
+const fs = require('fs');
+const axios = require('axios');
+const cheerio = require('cheerio');
+const admin = require('firebase-admin');
+require('dotenv').config();
+
+const app = express();
+const PORT = process.env.PORT || 10000;
+
+// Initialize Firebase Admin
+// You'll need to download service account key from Firebase Console
+// Settings -> Service Accounts -> Generate New Private Key
+try {
+    const serviceAccount = require('./firebase-admin-key.json');
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+    });
+} catch (error) {
+    console.error('Firebase Admin initialization failed:', error.message);
+    console.log('Make sure firebase-admin-key.json exists in the project root');
+}
+
+const db = admin.firestore();
+
+const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
+});
+
+app.use(cors());
+app.use(express.json());
+app.use(express.static(__dirname));
+
+// Helper function to get user data
+async function getUserData(userId) {
+    try {
+        const userDoc = await db.collection('users').doc(userId).get();
+        if (!userDoc.exists) {
+            return null;
+        }
+        return userDoc.data();
+    } catch (error) {
+        console.error('Error getting user data:', error);
+        return null;
+    }
+}
+
+// Helper function to update user credits
+async function updateUserCredits(userId, credits) {
+    try {
+        await db.collection('users').doc(userId).update({ credits });
+        return true;
+    } catch (error) {
+        console.error('Error updating credits:', error);
+        return false;
+    }
+}
+
+// Call Google Gemini API
+function callGemini(prompt) {
+    return new Promise((resolve, reject) => {
+        const apiKey = process.env.GEMINI_API_KEY;
+        const body = JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { maxOutputTokens: 2000, temperature: 0.8 }
+        });
+
+        const options = {
+            hostname: 'generativelanguage.googleapis.com',
+            path: `/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(body)
+            }
+        };
+
+        const req = https.request(options, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+                try {
+                    const parsed = JSON.parse(data);
+                    if (parsed.error) return reject(new Error(parsed.error.message));
+                    const text = parsed.candidates[0].content.parts[0].text;
+                    resolve(text);
+                } catch(e) {
+                    reject(new Error('Failed to parse Gemini response'));
+                }
+            });
+        });
+
+        req.on('error', reject);
+        req.write(body);
+        req.end();
+    });
+}
+
+// Generate LinkedIn Post
+app.post('/api/generate-linkedin', async (req, res) => {
+    try {
+        const { topic, format, tone, length, emojis, userId } = req.body;
+
+        if (!userId) {
+            return res.json({ success: false, error: 'User ID required' });
+        }
+
+        // Get user data from Firebase
+        const userData = await getUserData(userId);
+        if (!userData) {
+            return res.json({ success: false, error: 'User not found' });
+        }
+
+        // Check credits
+        if (userData.plan === 'free' && userData.credits <= 0) {
+            return res.json({ success: false, error: 'No credits left. Please upgrade!' });
+        }
+
+        const formats = {
+            story: 'Write as a personal story with a hook, tension, and lesson.',
+            howto: 'Write as a step-by-step how-to guide.',
+            list: 'Write as a list of tips or insights.',
+            contrarian: 'Write as a contrarian/unpopular opinion that challenges common beliefs.',
+            question: 'Write as a thought-provoking question to spark discussion.'
+        };
+        const lengths = { short: '100-150 words', medium: '150-250 words', long: '250-400 words' };
+
+        const prompt = `You are a viral LinkedIn content expert. Create an engaging LinkedIn post.
+
+TOPIC: ${topic}
+FORMAT: ${formats[format] || formats.story}
+TONE: ${tone}
+LENGTH: ${lengths[length] || lengths.medium}
+EMOJIS: ${emojis ? 'Use 2-4 relevant emojis' : 'No emojis'}
+
+RULES:
+- Start with a strong hook that stops scrolling
+- Short paragraphs (1-2 sentences max)
+- Add line breaks for readability
+- End with a question or call-to-action
+- Be conversational and authentic
+- No hashtags unless specifically asked
+
+Generate ONLY the LinkedIn post, nothing else:`;
+
+        const content = await callGemini(prompt);
+
+        // Deduct credit for free users
+        let newCredits = userData.credits;
+        if (userData.plan === 'free') {
+            newCredits = userData.credits - 1;
+            await updateUserCredits(userId, newCredits);
+        }
+
+        res.json({
+            success: true,
+            content: content.trim(),
+            creditsRemaining: newCredits
+        });
+
+    } catch (error) {
+        console.error('Generation error:', error.message);
+        res.status(500).json({ success: false, error: 'AI generation failed: ' + error.message });
+    }
+});
+
+// Create Razorpay Order
+app.post('/api/create-order', async (req, res) => {
+    try {
+        const { amount, plan, userId } = req.body;
+        const order = await razorpay.orders.create({
+            amount: amount * 100,
+            currency: process.env.RAZORPAY_CURRENCY || 'INR',
+            receipt: `rcpt_${Date.now()}`,
+            notes: { userId, plan }
+        });
+        res.json({
+            success: true,
+            orderId: order.id,
+            amount: order.amount,
+            currency: order.currency,
+            razorpayKeyId: process.env.RAZORPAY_KEY_ID
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Verify Payment
+app.post('/api/verify-payment', async (req, res) => {
+    try {
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, plan } = req.body;
+        const sign = razorpay_order_id + '|' + razorpay_payment_id;
+        const expectedSign = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET).update(sign).digest('hex');
+        
+        if (razorpay_signature !== expectedSign) {
+            return res.status(400).json({ success: false, message: 'Invalid signature' });
+        }
+        
+        // Update user plan in Firebase
+        const credits = plan === 'starter' ? 50 : 999999;
+        await db.collection('users').doc(userId).update({
+            plan: plan,
+            credits: credits,
+            lastPayment: new Date().toISOString()
+        });
+        
+        res.json({ success: true, message: 'Payment verified!', plan, credits });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+app.get('/api/user/:email', (req, res) => {
+    res.json({ success: true, user: getUser(req.params.email) });
+});
+app.get('/', (req, res) => {
+     res.sendFile(path.join(__dirname,'landing.html'));
+     });
+
+
+app.listen(PORT, () => {
+    console.log('\n✅ LinkedIn Generator is RUNNING on port ${PORT}');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log(`📝 Landing Page : /landing.html`);
+    console.log(`⚡ App          : /app.html`);
+    console.log(`💳 Payment Page : /payment.html`);
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('🤖 Using: Google Gemini AI (FREE)');
+    console.log('💰 Payments: Razorpay');
+    console.log('🔥 Database: Firebase Firestore\n');
+});
