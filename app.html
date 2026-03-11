@@ -76,120 +76,123 @@
         }
         
         /* Main Container */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: none;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
         }
-        .container.active { display: block; }
         
-        .header {
-            background: white;
-            padding: 1.5rem 2rem;
-            border-radius: 12px;
-            margin-bottom: 2rem;
+        .navbar {
+            background: #0077B5;
+            color: white;
+            padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
-        .header h1 {
-            color: #667eea;
-            font-size: 1.8rem;
+        .logo {
+            font-size: 1.3rem;
+            font-weight: bold;
         }
         
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-        
-        .credits-badge {
-            background: #f0f4ff;
+        .credits {
+            background: rgba(255,255,255,0.2);
             padding: 0.5rem 1rem;
             border-radius: 20px;
-            font-weight: 600;
-            color: #667eea;
+            font-size: 0.9rem;
         }
         
-        .logout-btn {
-            background: #ff4757;
-            color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        
-        .main-content {
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2rem;
         }
         
-        .input-section, .output-section {
+        .panel {
             background: white;
+            border-radius: 10px;
             padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
-        h2 {
+        .panel h2 {
             margin-bottom: 1.5rem;
-            color: #333;
+            color: #0077B5;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
         }
         
         label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #555;
             font-weight: 600;
+            color: #333;
         }
         
-        input, select, textarea {
+        textarea, select, input {
             width: 100%;
-            padding: 0.8rem;
-            margin-bottom: 1.2rem;
+            padding: 0.75rem;
             border: 2px solid #e0e0e0;
-            border-radius: 8px;
+            border-radius: 5px;
             font-size: 1rem;
             font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus, select:focus, input:focus {
+            outline: none;
+            border-color: #0077B5;
         }
         
         textarea {
-            min-height: 100px;
+            min-height: 120px;
             resize: vertical;
+        }
+        
+        .option-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
         }
         
         .generate-btn {
             width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0077B5 0%, #00A0DC 100%);
             color: white;
             border: none;
-            border-radius: 8px;
+            padding: 1rem;
             font-size: 1.1rem;
-            font-weight: 600;
+            font-weight: bold;
+            border-radius: 5px;
             cursor: pointer;
             transition: transform 0.2s;
         }
-        .generate-btn:hover { transform: translateY(-2px); }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+        }
+        
         .generate-btn:disabled {
-            background: #ccc;
+            opacity: 0.6;
             cursor: not-allowed;
         }
         
         .output-box {
-            background: #f8f9fa;
+            background: #f9f9f9;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
             padding: 1.5rem;
-            border-radius: 8px;
             min-height: 300px;
             white-space: pre-wrap;
             line-height: 1.8;
-            color: #333;
-            border: 2px solid #e0e0e0;
+            font-size: 1rem;
         }
         
         .output-box.empty {
@@ -197,58 +200,86 @@
             align-items: center;
             justify-content: center;
             color: #999;
+            font-style: italic;
         }
         
-        .copy-btn {
-            width: 100%;
-            padding: 0.8rem;
-            background: #10b981;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
             margin-top: 1rem;
         }
-        .copy-btn:hover { background: #059669; }
+        
+        .action-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #0077B5;
+            background: white;
+            color: #0077B5;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: #0077B5;
+            color: white;
+        }
         
         .loading {
+            display: none;
             text-align: center;
-            color: #667eea;
-            font-weight: 600;
+            padding: 2rem;
+            color: #0077B5;
         }
         
-        .error {
-            background: #fee;
-            border: 1px solid #fcc;
-            color: #c33;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
+        .loading.active {
+            display: block;
         }
         
-        .upgrade-notice {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0077B5;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .upgrade-banner {
+            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            color: white;
             padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
             text-align: center;
+            border-radius: 5px;
+            margin-bottom: 1rem;
         }
         
         .upgrade-btn {
-            background: #ffc107;
-            color: #333;
+            background: white;
+            color: #FF6B35;
             border: none;
-            padding: 0.6rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-weight: bold;
             cursor: pointer;
             margin-top: 0.5rem;
         }
         
         @media (max-width: 768px) {
-            .main-content { grid-template-columns: 1fr; }
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .option-group {
+                grid-template-columns: 1fr;
+            }
         }
 
         .google-btn {
