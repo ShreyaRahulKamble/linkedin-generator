@@ -151,17 +151,14 @@ Generate ONLY the LinkedIn post, nothing else:`;
 
         const content = await callGemini(prompt);
 
-        // Deduct credit for free users
-        let newCredits = userData.credits;
-        if (userData.plan === 'free') {
-            newCredits = userData.credits - 1;
-            await updateUserCredits(userId, newCredits);
+        if (user.plan === 'free' && email) {
+            updateUser(email, { credits: user.credits - 1 });
         }
 
         res.json({
             success: true,
             content: content.trim(),
-            creditsRemaining: newCredits
+            creditsRemaining: user.plan === 'free' ? user.credits - 1 : 999
         });
 
     } catch (error) {
@@ -169,6 +166,7 @@ Generate ONLY the LinkedIn post, nothing else:`;
         res.status(500).json({ success: false, error: 'AI generation failed: ' + error.message });
     }
 });
+
 
 // Create Razorpay Order
 app.post('/api/create-order', async (req, res) => {

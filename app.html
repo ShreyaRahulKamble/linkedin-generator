@@ -308,6 +308,7 @@
     </style>
 </head>
 <body>
+   
 
 <!-- Auth Modal -->
 <div class="auth-modal active" id="authModal">
@@ -326,74 +327,108 @@
 </div>
 
 <!-- Main App -->
-<div class="container" id="mainApp">
-    <div class="header">
-        <h1>✨ LinkedIn Post Generator</h1>
-        <div class="user-info">
-            <span class="credits-badge" id="creditsDisplay">Credits: -</span>
-            <span id="userEmail"></span>
-            <button class="logout-btn" onclick="handleLogout()">Logout</button>
-        </div>
+<nav class="navbar">
+    <div class="logo">📝 LinkedInGenie</div>
+    <div class="credits">
+        Credits: <span id="creditCount">3</span> / <span id="creditLimit">3</span>
     </div>
+</nav>
 
-    <div id="upgradeNotice" style="display: none;" class="upgrade-notice">
-        <strong>⚠️ No credits remaining!</strong>
-        <button class="upgrade-btn" onclick="window.location.href='payment.html'">Upgrade Plan</button>
-    </div>
 
-    <div class="main-content">
-        <div class="input-section">
+<div class="container">
+        <!-- Input Panel -->
+        <div class="panel">
             <h2>Create Your Post</h2>
             
-            <label>Topic / Main Idea</label>
-            <textarea id="topic" placeholder="E.g., How AI is transforming customer service"></textarea>
-            
-            <label>Post Format</label>
-            <select id="format">
-                <option value="story">Story / Personal Experience</option>
-                <option value="howto">How-To Guide</option>
-                <option value="list">List / Tips</option>
-                <option value="contrarian">Contrarian / Hot Take</option>
-                <option value="question">Thought-Provoking Question</option>
-            </select>
-            
-            <label>Tone</label>
-            <select id="tone">
-                <option value="professional">Professional</option>
-                <option value="casual">Casual</option>
-                <option value="thought-leader">Thought Leader</option>
-                <option value="inspiring">Inspiring</option>
-            </select>
-            
-            <label>Length</label>
-            <select id="length">
-                <option value="short">Short (100-150 words)</option>
-                <option value="medium">Medium (150-250 words)</option>
-                <option value="long">Long (250-400 words)</option>
-            </select>
-            
-            <label>
-                <input type="checkbox" id="emojis" checked> Include Emojis
-            </label>
-            
-            <button type="submit" class="generate-btn" id="generateBtn">
-                ✨ Generate Post
-            </button>
+            <div id="upgradeBanner" class="upgrade-banner" style="display: none;">
+                <p><strong>Out of credits!</strong> Upgrade to continue creating content.</p>
+                <button class="upgrade-btn" onclick="showPricing()">Upgrade Now</button>
+                <button class="logout-btn" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+    <form id="generateForm">
+                <div class="form-group">
+                    <label for="topic">What do you want to write about?</label>
+                    <textarea 
+                        id="topic" 
+                        placeholder="E.g., 'How AI is changing marketing' or paste an article URL..."
+                        required
+                    ></textarea>
+                </div>
+                
+                <div class="option-group">
+                    <div class="form-group">
+                        <label for="format">Post Format</label>
+                        <select id="format">
+                            <option value="story">Storytelling</option>
+                            <option value="howto">How-To Guide</option>
+                            <option value="list">List/Tips</option>
+                            <option value="contrarian">Contrarian Take</option>
+                            <option value="question">Question Post</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tone">Tone</label>
+                        <select id="tone">
+                            <option value="professional">Professional</option>
+                            <option value="casual">Casual</option>
+                            <option value="thought-leader">Thought Leader</option>
+                            <option value="inspiring">Inspiring</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="option-group">
+                    <div class="form-group">
+                        <label for="length">Length</label>
+                        <select id="length">
+                            <option value="short">Short (100-150 words)</option>
+                            <option value="medium">Medium (150-250 words)</option>
+                            <option value="long">Long (250-400 words)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="emojis">Emojis</label>
+                        <select id="emojis">
+                            <option value="yes">Yes, use emojis</option>
+                            <option value="no">No emojis</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="generate-btn" id="generateBtn" >
+                    ✨ Generate LinkedIn Post
+                </button>
+            </form>
         </div>
         
-        <div class="output-section">
-            <h2>Generated Post</h2>
-            <div class="output-box empty" id="output">
-                Your generated post will appear here...
+        <!-- Output Panel -->
+        <div class="panel">
+            <h2>Your Generated Post</h2>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Generating your viral content...</p>
             </div>
-            <button class="copy-btn" id="copyBtn" onclick="copyToClipboard()" style="display: none;">
-                📋 Copy to Clipboard
-            </button>
+            
+            <div id="output" class="output-box empty">
+                Your generated LinkedIn post will appear here...
+            </div>
+            
+            <div class="action-buttons" id="actionButtons" style="display: none;">
+                <button class="action-btn" onclick="copyToClipboard()">📋 Copy</button>
+                <button class="action-btn" onclick="regenerate()">🔄 Regenerate</button>
+                <button class="action-btn" onclick="clearOutput()">🗑️ Clear</button>
+            </div>
         </div>
     </div>
-</div>
 
 <script type="module">
+    let userCredits = 3;
+    let userPlan = 'free'; // free, starter, pro
+
     let currentUser = null;
     let userData = null;
 
@@ -458,88 +493,99 @@
         userData    = null;
     }
 
+    
     // ── Credits display ─────────────────────────────────────────────
-    function updateCreditsDisplay() {
-        const creditsEl     = document.getElementById('creditsDisplay');
-        const upgradeNotice = document.getElementById('upgradeNotice');
-        const generateBtn   = document.getElementById('generateBtn');
-
-        if (userData.plan === 'free') {
-            creditsEl.textContent = `Credits: ${userData.credits}/3`;
-            if (userData.credits <= 0) {
-                upgradeNotice.style.display = 'block';
-                generateBtn.disabled = true;
+    function updateCredits() {
+          document.getElementById('creditCount').textContent = userCredits;
+            
+            if (userCredits <= 0) {
+                document.getElementById('upgradeBanner').style.display = 'block';
+                document.getElementById('generateBtn').disabled = true;
             }
-        } else if (userData.plan === 'starter') {
-            creditsEl.textContent = `Credits: ${userData.credits}/50`;
-        } else {
-            creditsEl.textContent = 'Unlimited Credits';
         }
-    }
-
-    // ── Generate post ────────────────────────────────────────────────
-    async function generatePost() {
-        if (!currentUser || !userData) return alert('Please log in first');
-        if (userData.plan === 'free' && userData.credits <= 0) {
-            alert('No credits remaining! Please upgrade your plan.');
-            window.location.href = 'payment.html';
-            return;
-        }
-
-        const topic = document.getElementById('topic').value.trim();
-        if (!topic) return alert('Please enter a topic');
-
-        const fb      = await import('./firebase-config.js');
-        const btn     = document.getElementById('generateBtn');
-        const output  = document.getElementById('output');
-        const copyBtn = document.getElementById('copyBtn');
-
-        btn.disabled    = true;
-        btn.textContent = '⏳ Generating...';
-        output.innerHTML = '<div class="loading">✨ Creating your viral post...</div>';
-        output.classList.remove('empty');
-        copyBtn.style.display = 'none';
-
-        try {
-            const response = await fetch('/api/generate-linkedin', {
-                method:  'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    topic,
-                    format:  document.getElementById('format').value,
-                    tone:    document.getElementById('tone').value,
-                    length:  document.getElementById('length').value,
-                    emojis:  document.getElementById('emojis').checked,
-                    userId:  currentUser.uid
-                })
-            });
-            const data = await response.json();
-
-            if (data.success) {
-                output.textContent    = data.content;
-                copyBtn.style.display = 'block';
-                if (userData.plan === 'free') {
-                    userData.credits = data.creditsRemaining;
-                    await fb.updateUserCredits(currentUser.uid, userData.credits);
-                    updateCreditsDisplay();
+    
+    // Handle form submission
+        document.getElementById('generateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (userCredits <= 0 && userPlan === 'free') {
+                alert('Out of credits! Please upgrade to continue.');
+                return;
+            }
+            
+            const topic = document.getElementById('topic').value;
+            const format = document.getElementById('format').value;
+            const tone = document.getElementById('tone').value;
+            const length = document.getElementById('length').value;
+            const emojis = document.getElementById('emojis').value;
+            
+            // Show loading
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('output').style.display = 'none';
+            document.getElementById('actionButtons').style.display = 'none';
+            await import('./firebase-config.js');    
+     
+    try {
+                const response = await fetch('/api/generate-linkedin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        topic,
+                        format,
+                        tone,
+                        length,
+                        emojis: emojis === 'yes'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Display output
+                    document.getElementById('output').textContent = data.content;
+                    document.getElementById('output').classList.remove('empty');
+                    document.getElementById('actionButtons').style.display = 'flex';
+                    
+                    // Decrease credits
+                    userCredits--;
+                    updateCredits();
+                } else {
+                    alert('Error: ' + data.error);
                 }
-            } else {
-                output.innerHTML = `<div class="error">${data.error}</div>`;
+            } catch (error) {
+                alert('Connection error. Make sure the server is running.');
+                console.error(error);
+            } finally {
+                // Hide loading
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('output').style.display = 'block';
             }
-        } catch (err) {
-            output.innerHTML = `<div class="error">Error: ${err.message}</div>`;
-        } finally {
-            btn.disabled    = false;
-            btn.textContent = '✨ Generate Post';
-        }
-    }
+        });
 
-    function copyToClipboard() {
-        navigator.clipboard.writeText(document.getElementById('output').textContent);
-        const btn = document.getElementById('copyBtn');
-        btn.textContent = '✅ Copied!';
-        setTimeout(() => btn.textContent = '📋 Copy to Clipboard', 2000);
+    // Copy to clipboard
+        function copyToClipboard() {
+            const output = document.getElementById('output').textContent;
+            navigator.clipboard.writeText(output).then(() => {
+                alert('✅ Copied to clipboard! Paste it on LinkedIn.');
+            });
+        }
+    // Regenerate with same inputs
+        function regenerate() {
+            document.getElementById('generateForm').dispatchEvent(new Event('submit'));
+        }
+        
+    // Clear output
+    function clearOutput() {
+        document.getElementById('output').textContent = 'Your generated LinkedIn post will appear here...';
+        document.getElementById('output').classList.add('empty');
+        document.getElementById('actionButtons').style.display = 'none';
     }
+    // Show pricing modal (placeholder)
+        function showPricing() {
+            alert('Upgrade options:\n\nStarter: $19/month - 50 posts\nPro: $39/month - Unlimited\n\nVisit billing page to upgrade!');
+        }
 
     // ── Auth state listener ─────────────────────────────────────────
     window.addEventListener('load', async () => {
@@ -567,6 +613,9 @@
             showError('Firebase failed to load: ' + err.message);
         }
     });
+    // Initialize
+        updateCredits();
+
 </script>
 
 </body>
