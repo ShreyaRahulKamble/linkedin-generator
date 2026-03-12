@@ -526,7 +526,7 @@
             await import('./firebase-config.js');    
      
     try {
-                const response = await fetch('/api/generate-linkedin', {
+                const response = await fetch('/api/generate-linkedin:1', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -602,7 +602,7 @@
                         document.getElementById('authModal').classList.remove('active');
                         document.getElementById('mainApp').classList.add('active');
                         document.getElementById('userEmail').textContent = user.displayName || user.email;
-                        updateCreditsDisplay();
+                        updateCredits();
                     }
                 } else {
                     document.getElementById('authModal').classList.add('active');
