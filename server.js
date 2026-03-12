@@ -103,7 +103,7 @@ function callGemini(prompt) {
 }
 
 // Generate LinkedIn Post
-app.post('/api/generate-linkedin', async (req, res) => {
+app.post('/api/generate-linkedin:1', async (req, res) => {
     try {
         const { topic, format, tone, length, emojis, userId } = req.body;
 
