@@ -516,6 +516,16 @@
                 document.getElementById('generateBtn').disabled = true;
             }
         }
+    // ── Generate post ────────────────────────────────────────────────
+    async function generatePost() {
+        if (!currentUser || !userData) return alert('Please log in first');
+        if (userData.plan === 'free' && userData.credits <= 0) {
+            alert('No credits remaining! Please upgrade your plan.');
+            window.location.href = 'payment.html';
+            return;
+        }
+    }
+
     
     // Handle form submission
         document.getElementById('generateForm').addEventListener('submit', async (e) => {
