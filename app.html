@@ -342,7 +342,7 @@
     <div class="credits">
         Credits: <span id="creditCount">3</span> / <span id="creditLimit">3</span>
         <span id="userEmail"></span>
-        <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        <button  onclick="handleLogout()" class="logout-btn">Logout</button>
     </div>
 </nav>
 
@@ -502,7 +502,9 @@
         await fb.logoutUser();
         currentUser = null;
         userData    = null;
+        window.location.href = "landing.html"
     }
+    window.handleLogout = handleLogout;
 
     
     // ── Credits display ─────────────────────────────────────────────
