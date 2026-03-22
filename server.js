@@ -153,6 +153,7 @@ Generate ONLY the LinkedIn post, nothing else:`;
 
         if (user.plan === 'free' && email) {
             updateUser(email, { credits: user.credits - 1 });
+            await updateUserCredits(userId, credits);
         }
 
         res.json({
