@@ -445,6 +445,7 @@
 
     const FIREBASE_VERSION = '10.7.1';
     const BASE = `https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}`;
+    import { getAuth } from `https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}`
 
     function showError(msg) {
         const el = document.getElementById('authError');
@@ -550,6 +551,8 @@
             document.getElementById('output').style.display = 'none';
             document.getElementById('actionButtons').style.display = 'none';
             await import('./firebase-config.js');  
+    
+    
     const { getAuth } = await import('./firebase-config.js');
     const auth = getAuth();
     const user = auth.currentUser;
@@ -648,7 +651,7 @@
         }
     });
     // Initialize
-        updateUserCredits();
+        updateCredits();
 
 </script>
 
