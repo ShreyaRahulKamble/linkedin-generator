@@ -549,7 +549,15 @@
             document.getElementById('loading').classList.add('active');
             document.getElementById('output').style.display = 'none';
             document.getElementById('actionButtons').style.display = 'none';
-            await import('./firebase-config.js');    
+            await import('./firebase-config.js');  
+    const { getAuth } = await import('./firebase-config.js');
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+        alert('Please sign in again');
+        return;
+    }
      
     try {
                 const response = await fetch('/api/generate-linkedin:1', {
@@ -640,7 +648,7 @@
         }
     });
     // Initialize
-        updateCredits();
+        updateUserCredits();
 
 </script>
 
