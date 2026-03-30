@@ -553,7 +553,8 @@
             await import('./firebase-config.js');  
     
     
-    const { auth } = await import('./firebase-config.js');
+    const { getAuth } = await import(`${BASE}/firebase-auth.js`);
+    const auth = getAuth();
     const user = auth.currentUser;
 
     if (!user) {
