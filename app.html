@@ -476,7 +476,7 @@
             const user     = result.user;
 
             // Create user doc in Firestore if first time
-            const userRef  = doc(db, 'users', userId);
+            const userRef  = doc(db, 'users', user.uid);
             const userSnap = await getDoc(userRef);
             if (!userSnap.exists()) {
                 await setDoc(userRef, {
@@ -630,7 +630,7 @@
             onAuthStateChanged(fb.auth, async (user) => {
                 if (user) {
                     currentUser = user;
-                    const result = await fb.getUserData(userId);
+                    const result = await fb.getUserData(user.uid);
                     if (result.success) {
                         userData = result.data;
                         document.getElementById('authModal').classList.remove('active');

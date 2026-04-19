@@ -112,7 +112,7 @@ app.post('/api/generate-linkedin:1', async (req, res) => {
         }
 
         // Get user data from Firebase
-        const userData = await getUserData(userId);
+        const userData = await getUserData(user.userId);
         if (!userData) {
             return res.json({ success: false, error: 'User not found' });
         }
