@@ -62,44 +62,66 @@ async function updateUserCredits(userId, credits) {
     }
 }
 
-// Call Google Gemini API
-function callGemini(prompt) {
-    return new Promise((resolve, reject) => {
-        const apiKey = process.env.GEMINI_API_KEY;
-        const body = JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 2000, temperature: 0.8 }
-        });
+// Call Google Gemini API with retry logic
+async function callGemini(prompt, retries = 3, delay = 1000) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            return await new Promise((resolve, reject) => {
+                const apiKey = process.env.GEMINI_API_KEY;
+                const body = JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: { maxOutputTokens: 2000, temperature: 0.8 }
+                });
 
-        const options = {
-            hostname: 'generativelanguage.googleapis.com',
-            path: `/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': Buffer.byteLength(body)
-            }
-        };
+                const options = {
+                    hostname: 'generativelanguage.googleapis.com',
+                    path: `/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Content-Length': Buffer.byteLength(body)
+                    }
+                };
 
-        const req = https.request(options, (res) => {
-            let data = '';
-            res.on('data', chunk => data += chunk);
-            res.on('end', () => {
-                try {
-                    const parsed = JSON.parse(data);
-                    if (parsed.error) return reject(new Error(parsed.error.message));
-                    const text = parsed.candidates[0].content.parts[0].text;
-                    resolve(text);
-                } catch(e) {
-                    reject(new Error('Failed to parse Gemini response'));
-                }
+                const req = https.request(options, (res) => {
+                    let data = '';
+                    res.on('data', chunk => data += chunk);
+                    res.on('end', () => {
+                        try {
+                            const parsed = JSON.parse(data);
+                            if (parsed.error) {
+                                const errorMsg = parsed.error.message;
+                                // Check if it's a rate limit or high demand error
+                                if ((res.statusCode === 429 || errorMsg.includes('high demand') || errorMsg.includes('overloaded')) && attempt < retries) {
+                                    reject(new Error(`RETRY:${errorMsg}`));
+                                } else {
+                                    reject(new Error(errorMsg));
+                                }
+                                return;
+                            }
+                            const text = parsed.candidates[0].content.parts[0].text;
+                            resolve(text);
+                        } catch(e) {
+                            reject(new Error('Failed to parse Gemini response'));
+                        }
+                    });
+                });
+
+                req.on('error', reject);
+                req.write(body);
+                req.end();
             });
-        });
-
-        req.on('error', reject);
-        req.write(body);
-        req.end();
-    });
+        } catch (error) {
+            const isRetryable = error.message.startsWith('RETRY:');
+            if (isRetryable && attempt < retries) {
+                console.log(`Attempt ${attempt} failed, retrying in ${delay}ms...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 2; // Exponential backoff
+                continue;
+            }
+            throw error;
+        }
+    }
 }
 
 // Generate LinkedIn Post
