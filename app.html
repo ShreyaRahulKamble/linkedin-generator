@@ -613,9 +613,9 @@
         document.getElementById('output').classList.add('empty');
         document.getElementById('actionButtons').style.display = 'none';
     };
-    // Show pricing modal (placeholder)
+    // Redirect to payment page for upgrade
     window.showPricing = function() {
-        alert('Upgrade options:\n\nStarter: $19/month - 50 posts\nPro: $39/month - Unlimited\n\nVisit billing page to upgrade!');
+        window.location.href = 'payment.html';
     };
 
     // ── Auth state listener ─────────────────────────────────────────
