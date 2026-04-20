@@ -596,27 +596,27 @@
         });
 
     // Copy to clipboard
-        function copyToClipboard() {
-            const output = document.getElementById('output').textContent;
-            navigator.clipboard.writeText(output).then(() => {
-                alert('✅ Copied to clipboard! Paste it on LinkedIn.');
-            });
-        }
+    window.copyToClipboard = function() {
+        const output = document.getElementById('output').textContent;
+        navigator.clipboard.writeText(output).then(() => {
+            alert('✅ Copied to clipboard! Paste it on LinkedIn.');
+        });
+    };
     // Regenerate with same inputs
-        function regenerate() {
-            document.getElementById('generateForm').dispatchEvent(new Event('submit'));
-        }
-        
+    window.regenerate = function() {
+        document.getElementById('generateForm').dispatchEvent(new Event('submit'));
+    };
+
     // Clear output
-    function clearOutput() {
+    window.clearOutput = function() {
         document.getElementById('output').textContent = 'Your generated LinkedIn post will appear here...';
         document.getElementById('output').classList.add('empty');
         document.getElementById('actionButtons').style.display = 'none';
-    }
+    };
     // Show pricing modal (placeholder)
-        function showPricing() {
-            alert('Upgrade options:\n\nStarter: $19/month - 50 posts\nPro: $39/month - Unlimited\n\nVisit billing page to upgrade!');
-        }
+    window.showPricing = function() {
+        alert('Upgrade options:\n\nStarter: $19/month - 50 posts\nPro: $39/month - Unlimited\n\nVisit billing page to upgrade!');
+    };
 
     // ── Auth state listener ─────────────────────────────────────────
     window.addEventListener('load', async () => {
