@@ -549,24 +549,20 @@
             document.getElementById('loading').classList.add('active');
             document.getElementById('output').style.display = 'none';
             document.getElementById('actionButtons').style.display = 'none';
-            await import('./firebase-config.js');  
-    const { getAuth } = await import('./firebase-config.js');
-    const { auth } = await import('./firebase-config.js');
-    const user = auth.currentUser;
 
-    if (!user) {
-        alert('Please sign in again');
-        return;
-    }
-     
-    try {
-                const response = await fetch('/api/generate-linkedin:1', {
+            if (!currentUser) {
+                alert('Please sign in again');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/generate-linkedin', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        userId: user.uid,
+                        userId: currentUser.uid,
                         topic,
                         format,
                         tone,
