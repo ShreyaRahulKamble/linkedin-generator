@@ -509,13 +509,20 @@
     
     // ── Credits display ─────────────────────────────────────────────
     function updateCredits() {
-          document.getElementById('creditCount').textContent = userCredits;
-            
-            if (userCredits <= 0) {
-                document.getElementById('upgradeBanner').style.display = 'block';
-                document.getElementById('generateBtn').disabled = true;
-            }
+        if (userData) {
+            userCredits = userData.credits;
+            userPlan = userData.plan;
         }
+        document.getElementById('creditCount').textContent = userCredits;
+
+        if (userCredits <= 0) {
+            document.getElementById('upgradeBanner').style.display = 'block';
+            document.getElementById('generateBtn').disabled = true;
+        } else {
+            document.getElementById('upgradeBanner').style.display = 'none';
+            document.getElementById('generateBtn').disabled = false;
+        }
+    }
     // ── Generate post ────────────────────────────────────────────────
     async function generatePost() {
         if (!currentUser || !userData) return alert('Please log in first');
@@ -644,8 +651,6 @@
             showError('Firebase failed to load: ' + err.message);
         }
     });
-    // Initialize
-        updateCredits();
 
 </script>
 
