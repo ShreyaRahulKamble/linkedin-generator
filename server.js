@@ -103,7 +103,7 @@ function callGemini(prompt) {
 }
 
 // Generate LinkedIn Post
-app.post('/api/generate-linkedin:1', async (req, res) => {
+app.post('/api/generate-linkedin', async (req, res) => {
     try {
         const { topic, format, tone, length, emojis, userId } = req.body;
 
@@ -112,7 +112,7 @@ app.post('/api/generate-linkedin:1', async (req, res) => {
         }
 
         // Get user data from Firebase
-        const userData = await getUserData(user.userId);
+        const userData = await getUserData(userId);
         if (!userData) {
             return res.json({ success: false, error: 'User not found' });
         }
@@ -151,15 +151,15 @@ Generate ONLY the LinkedIn post, nothing else:`;
 
         const content = await callGemini(prompt);
 
-        if (user.plan === 'free' && email) {
-            updateUser(email, { credits: user.credits - 1 });
-            await updateUserCredits(userId, credits);
+        // Update credits for free plan users
+        if (userData.plan === 'free') {
+            await updateUserCredits(userId, userData.credits - 1);
         }
 
         res.json({
             success: true,
             content: content.trim(),
-            creditsRemaining: user.plan === 'free' ? user.credits - 1 : 999
+            creditsRemaining: userData.plan === 'free' ? userData.credits - 1 : 999
         });
 
     } catch (error) {
