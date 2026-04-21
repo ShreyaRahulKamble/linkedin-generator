@@ -840,6 +840,77 @@
         }
     });
 
+    // ── Settings Modal Functions ─────────────────────────────────
+    window.openSettingsModal = function() {
+        const modal = document.getElementById('settingsModal');
+        if (userData) {
+            // Load current preferences
+            document.getElementById('industry').value = userData.industry || '';
+            document.getElementById('role').value = userData.role || '';
+            document.getElementById('niche').value = userData.niche || '';
+            document.getElementById('stylePreference').value = userData.stylePreference || '';
+        }
+        modal.classList.add('active');
+    };
+
+    window.closeSettingsModal = function() {
+        document.getElementById('settingsModal').classList.remove('active');
+        document.getElementById('settingsMessage').style.display = 'none';
+    };
+
+    // Handle settings form submission
+    document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const industry = document.getElementById('industry').value;
+        const role = document.getElementById('role').value;
+        const niche = document.getElementById('niche').value;
+        const stylePreference = document.getElementById('stylePreference').value;
+
+        try {
+            const fb = await import('./firebase-config.js');
+
+            const profileData = {
+                industry: industry || null,
+                role: role || null,
+                niche: niche || null,
+                stylePreference: stylePreference || null
+            };
+
+            // Update in Firebase
+            const result = await fb.updateUserProfile(currentUser.uid, profileData);
+
+            if (result.success) {
+                // Update local userData
+                userData.industry = industry || null;
+                userData.role = role || null;
+                userData.niche = niche || null;
+                userData.stylePreference = stylePreference || null;
+
+                // Show success message
+                const msg = document.getElementById('settingsMessage');
+                msg.textContent = '✅ Settings saved successfully!';
+                msg.classList.add('success');
+                msg.classList.remove('error');
+                msg.style.display = 'block';
+
+                // Close modal after 1.5 seconds
+                setTimeout(() => {
+                    window.closeSettingsModal();
+                }, 1500);
+            } else {
+                throw new Error(result.error || 'Failed to save settings');
+            }
+        } catch (error) {
+            const msg = document.getElementById('settingsMessage');
+            msg.textContent = '❌ Error: ' + error.message;
+            msg.classList.add('error');
+            msg.classList.remove('success');
+            msg.style.display = 'block';
+            console.error('Settings save error:', error);
+        }
+    });
+
 </script>
 
 </body>

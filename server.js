@@ -153,7 +153,16 @@ app.post('/api/generate-linkedin', async (req, res) => {
         };
         const lengths = { short: '100-150 words', medium: '150-250 words', long: '250-400 words' };
 
-        const prompt = `You are a viral LinkedIn content expert. Create an engaging LinkedIn post.
+        // Extract personalization data
+        const { industry, role, niche, stylePreference } = userData;
+
+        const prompt = `You are a viral LinkedIn content expert. Create an engaging LinkedIn post tailored for the user's profile.
+
+USER PROFILE:
+- Industry: ${industry || 'General/Diverse'}
+- Role/Position: ${role || 'Professional'}
+- Expertise/Niche: ${niche || 'General'}
+- Preferred Style: ${stylePreference || 'Storytelling'}
 
 TOPIC: ${topic}
 FORMAT: ${formats[format] || formats.story}
@@ -162,6 +171,9 @@ LENGTH: ${lengths[length] || lengths.medium}
 EMOJIS: ${emojis ? 'Use 2-4 relevant emojis' : 'No emojis'}
 
 RULES:
+- Create content that resonates with their industry and expertise
+- Use language and examples relevant to their niche
+- Maintain their preferred style throughout the post
 - Start with a strong hook that stops scrolling
 - Short paragraphs (1-2 sentences max)
 - Add line breaks for readability
@@ -187,6 +199,36 @@ Generate ONLY the LinkedIn post, nothing else:`;
     } catch (error) {
         console.error('Generation error:', error.message);
         res.status(500).json({ success: false, error: 'AI generation failed: ' + error.message });
+    }
+});
+
+// Update User Profile (Personalization)
+app.post('/api/update-profile', async (req, res) => {
+    try {
+        const { userId, industry, role, niche, stylePreference } = req.body;
+
+        if (!userId) {
+            return res.json({ success: false, error: 'User ID required' });
+        }
+
+        // Update user profile in Firestore
+        const profileData = {
+            industry: industry || null,
+            role: role || null,
+            niche: niche || null,
+            stylePreference: stylePreference || null
+        };
+
+        await db.collection('users').doc(userId).update(profileData);
+
+        res.json({
+            success: true,
+            message: 'Profile updated successfully',
+            data: profileData
+        });
+    } catch (error) {
+        console.error('Profile update error:', error);
+        res.status(500).json({ success: false, error: 'Failed to update profile: ' + error.message });
     }
 });
 
