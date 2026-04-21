@@ -315,6 +315,116 @@
             opacity: 0.6;
             cursor: not-allowed;
         }
+
+        /* Settings Modal */
+        .settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+        }
+        .settings-modal.active {
+            display: flex;
+        }
+
+        .settings-box {
+            background: white;
+            border-radius: 12px;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: auto;
+        }
+
+        .settings-form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .settings-form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .settings-form-group select,
+        .settings-form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .settings-form-group select:focus,
+        .settings-form-group input:focus {
+            outline: none;
+            border-color: #0077B5;
+        }
+
+        .settings-save-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #0077B5 0%, #00A0DC 100%);
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 1rem;
+        }
+
+        .settings-save-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .settings-navbar-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .settings-navbar-btn:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        #settingsMessage {
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        #settingsMessage.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        #settingsMessage.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
     </style>
 </head>
 <body>
@@ -336,12 +446,85 @@
     </div>
 </div>
 
-<!-- Main App -->
+<!-- Settings Modal -->
+<div class="settings-modal" id="settingsModal">
+    <div class="settings-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2 style="margin: 0; color: #0077B5;">⚙️ Profile Settings</h2>
+            <button onclick="closeSettingsModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999;">✕</button>
+        </div>
+
+        <form id="settingsForm">
+            <!-- Industry Field -->
+            <div class="settings-form-group">
+                <label for="industry">Industry</label>
+                <select id="industry">
+                    <option value="">Select your industry...</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Sales">Sales</option>
+                    <option value="HR">Human Resources</option>
+                    <option value="Operations">Operations</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <!-- Role Field -->
+            <div class="settings-form-group">
+                <label for="role">Role</label>
+                <select id="role">
+                    <option value="">Select your role...</option>
+                    <option value="Manager">Manager</option>
+                    <option value="Individual Contributor">Individual Contributor</option>
+                    <option value="Founder">Founder</option>
+                    <option value="Executive">Executive</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <!-- Niche Field -->
+            <div class="settings-form-group">
+                <label for="niche">Niche/Specialization</label>
+                <select id="niche">
+                    <option value="">Select your niche...</option>
+                    <option value="AI">Artificial Intelligence</option>
+                    <option value="SaaS">SaaS</option>
+                    <option value="Web3">Web3/Crypto</option>
+                    <option value="B2B">B2B</option>
+                    <option value="B2C">B2C</option>
+                    <option value="E-commerce">E-commerce</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <!-- Style Preference Field -->
+            <div class="settings-form-group">
+                <label for="stylePreference">Preferred Style</label>
+                <select id="stylePreference">
+                    <option value="">Select your style...</option>
+                    <option value="storytelling">Storytelling</option>
+                    <option value="data-driven">Data-Driven</option>
+                    <option value="controversial">Contrarian/Bold</option>
+                    <option value="inspirational">Inspirational</option>
+                    <option value="mix">Mix of Styles</option>
+                </select>
+            </div>
+
+            <!-- Save Button -->
+            <button type="submit" class="settings-save-btn">💾 Save Settings</button>
+        </form>
+
+        <div id="settingsMessage" style="display: none; margin-top: 1rem; text-align: center;"></div>
+    </div>
+</div>
+
 <nav class="navbar" id="mainApp">
     <div class="logo">📝 LinkedInGenie</div>
     <div class="credits">
         Credits: <span id="creditCount">3</span> / <span id="creditLimit">3</span>
         <span id="userEmail"></span>
+        <button onclick="openSettingsModal()" class="settings-navbar-btn">⚙️ Settings</button>
         <button  onclick="handleLogout()" class="logout-btn">Logout</button>
     </div>
 </nav>
@@ -484,7 +667,12 @@
                     name:      user.displayName,
                     plan:      'free',
                     credits:   3,
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    // Personalization fields
+                    industry:       null,
+                    role:           null,
+                    niche:          null,
+                    stylePreference: null
                 });
             }
             // onAuthStateChanged will fire and show the main app

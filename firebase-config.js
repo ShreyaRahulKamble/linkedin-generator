@@ -92,7 +92,12 @@ export async function createUserDoc(user) {
                 name:      user.displayName,
                 plan:      'free',
                 credits:   3,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                // Personalization fields
+                industry:       null,
+                role:           null,
+                niche:          null,
+                stylePreference: null
             });
         }
         return { success: true };
@@ -106,6 +111,17 @@ export async function updateUserCredits(userId, credits) {
     try {
         const userRef = doc(db, 'users', userId);
         await updateDoc(userRef, { credits });
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+// ── Update user profile (personalization) ─────────────────────
+export async function updateUserProfile(userId, profileData) {
+    try {
+        const userRef = doc(db, 'users', userId);
+        await updateDoc(userRef, profileData);
         return { success: true };
     } catch (error) {
         return { success: false, error: error.message };
