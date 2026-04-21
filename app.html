@@ -773,9 +773,10 @@
                     document.getElementById('output').textContent = data.content;
                     document.getElementById('output').classList.remove('empty');
                     document.getElementById('actionButtons').style.display = 'flex';
-                    
-                    // Decrease credits
-                    userCredits--;
+
+                    // Update credits from server response
+                    userCredits = data.creditsRemaining;
+                    userData.credits = data.creditsRemaining;
                     updateCredits();
                 } else {
                     alert('Error: ' + data.error);
