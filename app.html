@@ -788,17 +788,28 @@
                     userData.credits = data.creditsRemaining;
                     updateCredits();
 
-                    // Refetch user data from Firebase to ensure sync
-                    try {
-                        const fb = await import('./firebase-config.js');
-                        const freshUserData = await fb.getUserData(currentUser.uid);
-                        if (freshUserData.success) {
-                            userData = freshUserData.data;
-                            updateCredits();
+                    // Refetch user data from Firebase to verify sync (after short delay)
+                    setTimeout(async () => {
+                        try {
+                            const fb = await import('./firebase-config.js');
+                            const freshUserData = await fb.getUserData(currentUser.uid);
+                            if (freshUserData.success) {
+                                const dbCredits = freshUserData.data.credits;
+                                const displayCredits = data.creditsRemaining;
+
+                                if (dbCredits !== displayCredits) {
+                                    console.warn(`⚠️ Database mismatch! Server said ${displayCredits} but database has ${dbCredits}`);
+                                    // Use database value as source of truth
+                                    userData = freshUserData.data;
+                                    updateCredits();
+                                } else {
+                                    console.log(`✅ Credits verified in database: ${dbCredits}`);
+                                }
+                            }
+                        } catch (err) {
+                            console.log('Note: Could not verify with Firebase');
                         }
-                    } catch (err) {
-                        console.log('Note: Could not sync with Firebase, using server response');
-                    }
+                    }, 500);
                 } else {
                     alert('Error: ' + data.error);
                 }

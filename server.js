@@ -16,14 +16,18 @@ const PORT = process.env.PORT || 10000;
 // Initialize Firebase Admin
 // You'll need to download service account key from Firebase Console
 // Settings -> Service Accounts -> Generate New Private Key
+let firebaseInitialized = false;
 try {
     const serviceAccount = require('./firebase-admin-key.json');
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccount)
     });
+    firebaseInitialized = true;
+    console.log('✅ Firebase Admin initialized successfully');
 } catch (error) {
-    console.error('Firebase Admin initialization failed:', error.message);
+    console.error('❌ Firebase Admin initialization failed:', error.message);
     console.log('Make sure firebase-admin-key.json exists in the project root');
+    console.log('To get it: Firebase Console → Project Settings → Service Accounts → Generate New Private Key');
 }
 
 const db = admin.firestore();
@@ -128,6 +132,13 @@ async function callGemini(prompt, retries = 3, delay = 1000) {
 // Generate LinkedIn Post
 app.post('/api/generate-linkedin', async (req, res) => {
     try {
+        if (!firebaseInitialized) {
+            return res.status(500).json({
+                success: false,
+                error: 'Server error: Firebase not initialized. Check firebase-admin-key.json'
+            });
+        }
+
         const { topic, format, tone, length, emojis, userId } = req.body;
 
         if (!userId) {
@@ -186,29 +197,27 @@ Generate ONLY the LinkedIn post, nothing else:`;
 
         const content = await callGemini(prompt);
 
-        // Update credits based on plan
+        // Update credits based on plan - THIS MUST SUCCEED
+        let updatedCredits = userData.credits;
         if (userData.plan === 'free' || userData.plan === 'starter') {
+            updatedCredits = userData.credits - 1;
             try {
-                await updateUserCredits(userId, userData.credits - 1);
-                console.log(`📊 Credits decremented for ${userData.plan} user. Was: ${userData.credits}, Now: ${userData.credits - 1}`);
+                await updateUserCredits(userId, updatedCredits);
+                console.log(`✅ SUCCESS: Decremented ${userData.plan} user credits from ${userData.credits} to ${updatedCredits}`);
             } catch (error) {
-                console.error(`❌ Failed to update credits in database:`, error.message);
+                console.error(`❌ CRITICAL: Failed to decrement credits:`, error.message);
+                // Return error - don't let request succeed if we can't update database
+                return res.status(500).json({
+                    success: false,
+                    error: 'Failed to update credits in database. Please try again.'
+                });
             }
-        }
-        // Pro plan users have unlimited credits (999), so no decrement needed
-
-        // Calculate credits remaining based on plan
-        let creditsRemaining;
-        if (userData.plan === 'pro') {
-            creditsRemaining = 999;
-        } else {
-            creditsRemaining = userData.credits - 1;
         }
 
         res.json({
             success: true,
             content: content.trim(),
-            creditsRemaining: creditsRemaining
+            creditsRemaining: updatedCredits
         });
 
     } catch (error) {
@@ -304,6 +313,37 @@ app.post('/api/verify-payment', async (req, res) => {
 });
 app.get('/api/user/:email', (req, res) => {
     res.json({ success: true, user: getUser(req.params.email) });
+});
+
+// Debug endpoint to check Firebase health
+app.get('/api/health', async (req, res) => {
+    if (!firebaseInitialized) {
+        return res.status(500).json({
+            status: 'error',
+            message: 'Firebase Admin not initialized',
+            solution: 'Upload firebase-admin-key.json file to server root'
+        });
+    }
+
+    try {
+        // Try to read a test document
+        const testRef = db.collection('_health').doc('test');
+        await testRef.set({ timestamp: new Date() });
+        const doc = await testRef.get();
+
+        return res.json({
+            status: 'ok',
+            firebase: 'connected',
+            message: 'Firebase Admin SDK is working correctly'
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: 'error',
+            firebase: 'connection failed',
+            message: error.message,
+            solution: 'Check firebase-admin-key.json credentials'
+        });
+    }
 });
 app.get('/', (req, res) => {
      res.sendFile(path.join(__dirname,'landing.html'));
