@@ -703,7 +703,16 @@
         }
         document.getElementById('creditCount').textContent = userCredits;
 
-        if (userCredits <= 0) {
+        // Update credit limit based on plan
+        let creditLimit = 3;
+        if (userPlan === 'starter') {
+            creditLimit = 50;
+        } else if (userPlan === 'pro') {
+            creditLimit = 999;
+        }
+        document.getElementById('creditLimit').textContent = creditLimit;
+
+        if (userPlan === 'free' && userCredits <= 0) {
             document.getElementById('upgradeBanner').style.display = 'block';
             document.getElementById('generateBtn').disabled = true;
         } else {
@@ -714,7 +723,7 @@
     // ── Generate post ────────────────────────────────────────────────
     async function generatePost() {
         if (!currentUser || !userData) return alert('Please log in first');
-        if (userData.plan === 'free' && userData.credits <= 0) {
+        if ((userData.plan === 'free' || userData.plan === 'starter') && userData.credits <= 0) {
             alert('No credits remaining! Please upgrade your plan.');
             window.location.href = 'payment.html';
             return;
@@ -724,12 +733,12 @@
 
 
 
-    
+
     // Handle form submission
         document.getElementById('generateForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            if (userCredits <= 0 && userPlan === 'free') {
+
+            if ((userPlan === 'free' || userPlan === 'starter') && userCredits <= 0) {
                 alert('Out of credits! Please upgrade to continue.');
                 return;
             }

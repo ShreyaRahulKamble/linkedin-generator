@@ -185,15 +185,24 @@ Generate ONLY the LinkedIn post, nothing else:`;
 
         const content = await callGemini(prompt);
 
-        // Update credits for free plan users
-        if (userData.plan === 'free') {
+        // Update credits based on plan
+        if (userData.plan === 'free' || userData.plan === 'starter') {
             await updateUserCredits(userId, userData.credits - 1);
+        }
+        // Pro plan users have unlimited credits (999), so no decrement needed
+
+        // Calculate credits remaining based on plan
+        let creditsRemaining;
+        if (userData.plan === 'pro') {
+            creditsRemaining = 999;
+        } else {
+            creditsRemaining = userData.credits - 1;
         }
 
         res.json({
             success: true,
             content: content.trim(),
-            creditsRemaining: userData.plan === 'free' ? userData.credits - 1 : 999
+            creditsRemaining: creditsRemaining
         });
 
     } catch (error) {
@@ -267,13 +276,21 @@ app.post('/api/verify-payment', async (req, res) => {
         }
         
         // Update user plan in Firebase
-        const credits = plan === 'starter' ? 50 : 999999;
+        let credits;
+        if (plan === 'starter') {
+            credits = 50;
+        } else if (plan === 'pro') {
+            credits = 999;
+        } else {
+            credits = 3; // fallback to free
+        }
+
         await db.collection('users').doc(userId).update({
             plan: plan,
             credits: credits,
             lastPayment: new Date().toISOString()
         });
-        
+
         res.json({ success: true, message: 'Payment verified!', plan, credits });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
