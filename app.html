@@ -776,7 +776,7 @@
                 });
                 
                 const data = await response.json();
-                
+
                 if (data.success) {
                     // Display output
                     document.getElementById('output').textContent = data.content;
@@ -787,6 +787,18 @@
                     userCredits = data.creditsRemaining;
                     userData.credits = data.creditsRemaining;
                     updateCredits();
+
+                    // Refetch user data from Firebase to ensure sync
+                    try {
+                        const fb = await import('./firebase-config.js');
+                        const freshUserData = await fb.getUserData(currentUser.uid);
+                        if (freshUserData.success) {
+                            userData = freshUserData.data;
+                            updateCredits();
+                        }
+                    } catch (err) {
+                        console.log('Note: Could not sync with Firebase, using server response');
+                    }
                 } else {
                     alert('Error: ' + data.error);
                 }

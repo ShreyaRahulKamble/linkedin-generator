@@ -55,10 +55,11 @@ async function getUserData(userId) {
 async function updateUserCredits(userId, credits) {
     try {
         await db.collection('users').doc(userId).update({ credits });
+        console.log(`✅ Credits updated for user ${userId}: ${credits}`);
         return true;
     } catch (error) {
-        console.error('Error updating credits:', error);
-        return false;
+        console.error('❌ Error updating credits:', error);
+        throw error; // Throw so endpoint knows it failed
     }
 }
 
@@ -187,7 +188,12 @@ Generate ONLY the LinkedIn post, nothing else:`;
 
         // Update credits based on plan
         if (userData.plan === 'free' || userData.plan === 'starter') {
-            await updateUserCredits(userId, userData.credits - 1);
+            try {
+                await updateUserCredits(userId, userData.credits - 1);
+                console.log(`📊 Credits decremented for ${userData.plan} user. Was: ${userData.credits}, Now: ${userData.credits - 1}`);
+            } catch (error) {
+                console.error(`❌ Failed to update credits in database:`, error.message);
+            }
         }
         // Pro plan users have unlimited credits (999), so no decrement needed
 
