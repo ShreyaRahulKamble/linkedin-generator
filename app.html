@@ -903,6 +903,11 @@
                     const result = await fb.getUserData(user.uid);
                     if (result.success) {
                         userData = result.data;
+                        // Ensure plan has a default value
+                        if (!userData.plan) {
+                            console.log('⚠️ No plan field found, defaulting to "free"');
+                            userData.plan = 'free';
+                        }
                         document.getElementById('authModal').classList.remove('active');
                         document.getElementById('mainApp').classList.add('active');
                         document.getElementById('userEmail').textContent = user.displayName || user.email;
