@@ -768,7 +768,7 @@
     // ── Generate post ────────────────────────────────────────────────
     async function generatePost() {
         if (!currentUser || !userData) return alert('Please log in first');
-        if ((userData.plan === 'free' || userData.plan === 'starter') && userData.credits <= 0) {
+        if ((userData.plan === 'free' || userData.plan === 'starter' || userData.plan === 'pro') && userData.credits <= 0) {
             alert('No credits remaining! Please upgrade your plan.');
             window.location.href = 'payment.html';
             return;
@@ -783,7 +783,7 @@
         document.getElementById('generateForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            if ((userPlan === 'free' || userPlan === 'starter') && userCredits <= 0) {
+            if ((userPlan === 'free' || userPlan === 'starter' || userPlan === 'pro') && userCredits <= 0) {
                 alert('Out of credits! Please upgrade to continue.');
                 return;
             }

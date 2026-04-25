@@ -218,7 +218,7 @@ Generate ONLY the LinkedIn post, nothing else:`;
 
         // Update credits based on plan - THIS MUST SUCCEED
         let updatedCredits = userData.credits;
-        if (userData.plan === 'free' || userData.plan === 'starter') {
+        if (userData.plan === 'free' || userData.plan === 'starter' || userData.plan === 'pro') {
             updatedCredits = userData.credits - 1;
             try {
                 console.log(`💾 Updating database: ${userData.plan} user credits ${userData.credits} → ${updatedCredits}`);
