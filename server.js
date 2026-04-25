@@ -131,8 +131,12 @@ async function callGemini(prompt, retries = 3, delay = 1000) {
 
 // Generate LinkedIn Post
 app.post('/api/generate-linkedin', async (req, res) => {
+    console.log('\n📝 [GENERATE POST] Request received');
+    console.log('   Firebase initialized:', firebaseInitialized);
+
     try {
         if (!firebaseInitialized) {
+            console.log('❌ Firebase not initialized - request rejected');
             return res.status(500).json({
                 success: false,
                 error: 'Server error: Firebase not initialized. Check firebase-admin-key.json'
@@ -140,19 +144,26 @@ app.post('/api/generate-linkedin', async (req, res) => {
         }
 
         const { topic, format, tone, length, emojis, userId } = req.body;
+        console.log('📝 User ID:', userId);
 
         if (!userId) {
+            console.log('❌ No userId provided');
             return res.json({ success: false, error: 'User ID required' });
         }
 
         // Get user data from Firebase
+        console.log('🔍 Fetching user data from Firebase...');
         const userData = await getUserData(userId);
         if (!userData) {
+            console.log('❌ User not found in database');
             return res.json({ success: false, error: 'User not found' });
         }
 
+        console.log(`👤 User found. Plan: ${userData.plan}, Credits: ${userData.credits}`);
+
         // Check credits
         if (userData.plan === 'free' && userData.credits <= 0) {
+            console.log('❌ User has no credits left');
             return res.json({ success: false, error: 'No credits left. Please upgrade!' });
         }
 
@@ -195,13 +206,16 @@ RULES:
 
 Generate ONLY the LinkedIn post, nothing else:`;
 
+        console.log('🤖 Calling Gemini API to generate post...');
         const content = await callGemini(prompt);
+        console.log('✅ Post generated successfully');
 
         // Update credits based on plan - THIS MUST SUCCEED
         let updatedCredits = userData.credits;
         if (userData.plan === 'free' || userData.plan === 'starter') {
             updatedCredits = userData.credits - 1;
             try {
+                console.log(`💾 Updating database: ${userData.plan} user credits ${userData.credits} → ${updatedCredits}`);
                 await updateUserCredits(userId, updatedCredits);
                 console.log(`✅ SUCCESS: Decremented ${userData.plan} user credits from ${userData.credits} to ${updatedCredits}`);
             } catch (error) {
@@ -214,14 +228,17 @@ Generate ONLY the LinkedIn post, nothing else:`;
             }
         }
 
+        console.log('📤 Sending response to client...');
         res.json({
             success: true,
             content: content.trim(),
             creditsRemaining: updatedCredits
         });
+        console.log(`✅ [COMPLETE] Post generated and credits updated. New balance: ${updatedCredits}\n`);
 
     } catch (error) {
-        console.error('Generation error:', error.message);
+        console.error(`❌ [ERROR] Generation error:`, error.message);
+        console.error(error);
         res.status(500).json({ success: false, error: 'AI generation failed: ' + error.message });
     }
 });
@@ -320,28 +337,71 @@ app.get('/api/health', async (req, res) => {
     if (!firebaseInitialized) {
         return res.status(500).json({
             status: 'error',
-            message: 'Firebase Admin not initialized',
-            solution: 'Upload firebase-admin-key.json file to server root'
+            firebase: 'NOT_INITIALIZED',
+            message: 'Firebase Admin not initialized - firebase-admin-key.json missing or invalid',
+            solution: 'Upload firebase-admin-key.json file and restart server'
         });
     }
 
     try {
         // Try to read a test document
-        const testRef = db.collection('_health').doc('test');
-        await testRef.set({ timestamp: new Date() });
-        const doc = await testRef.get();
+        const usersRef = db.collection('users');
+        const snapshot = await usersRef.limit(1).get();
 
         return res.json({
             status: 'ok',
-            firebase: 'connected',
-            message: 'Firebase Admin SDK is working correctly'
+            firebase: 'CONNECTED',
+            message: 'Firebase is working correctly',
+            users_in_database: snapshot.size > 0 ? 'yes' : 'no'
         });
     } catch (error) {
         return res.status(500).json({
             status: 'error',
-            firebase: 'connection failed',
+            firebase: 'CONNECTION_FAILED',
             message: error.message,
             solution: 'Check firebase-admin-key.json credentials'
+        });
+    }
+});
+
+// Debug endpoint to test credit update
+app.get('/api/test-credits/:userId', async (req, res) => {
+    if (!firebaseInitialized) {
+        return res.status(500).json({
+            status: 'error',
+            message: 'Firebase not initialized'
+        });
+    }
+
+    try {
+        const userData = await getUserData(req.params.userId);
+        if (!userData) {
+            return res.json({
+                status: 'error',
+                message: 'User not found'
+            });
+        }
+
+        const currentCredits = userData.credits;
+        const testCredits = currentCredits - 1;
+
+        // Try to update to test value
+        await updateUserCredits(req.params.userId, testCredits);
+
+        // Verify it was updated
+        const updated = await getUserData(req.params.userId);
+
+        res.json({
+            status: 'ok',
+            original_credits: currentCredits,
+            test_update: testCredits,
+            verified_in_database: updated.credits,
+            update_successful: updated.credits === testCredits
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: error.message
         });
     }
 });
