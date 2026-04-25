@@ -247,13 +247,42 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     
     <script>
+        let currentUser = null;
+        let userEmail = null;
+
+        // Get logged-in user on page load
+        window.addEventListener('load', async () => {
+            try {
+                const { getAuth, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
+                const fb = await import('./firebase-config.js');
+
+                onAuthStateChanged(fb.auth, (user) => {
+                    if (user) {
+                        currentUser = user;
+                        userEmail = user.email;
+                        console.log('✅ User logged in:', userEmail);
+                    } else {
+                        alert('Please log in first!');
+                        window.location.href = '/app.html';
+                    }
+                });
+            } catch (error) {
+                console.error('Auth error:', error);
+            }
+        });
+
         async function initiatePayment(plan, amount) {
             try {
-                // Get user email (you'd get this from session/login)
-                const email = prompt('Enter your email:') || 'customer@example.com';
-                
+                // Use logged-in user's email
+                if (!userEmail) {
+                    alert('Please log in first!');
+                    return;
+                }
+
+                console.log('💳 Initiating payment for:', userEmail);
+
                 // Create order on your backend
-                const response = await fetch('http://localhost:3000/api/create-order', {
+                const response = await fetch('http://localhost:10000/api/create-order', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -261,17 +290,18 @@
                     body: JSON.stringify({
                         amount: amount,
                         plan: plan,
-                        email: email
+                        email: userEmail,
+                        userId: currentUser.uid
                     })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (!data.success) {
                     alert('Error creating order: ' + data.error);
                     return;
                 }
-                
+
                 // Open Razorpay Checkout
                 const options = {
                     key: data.razorpayKeyId, // Your Razorpay Key ID
@@ -281,11 +311,11 @@
                     description: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan`,
                     image: 'https://your-logo-url.com/logo.png', // Your logo
                     order_id: data.orderId,
-                    
+
                     // Success handler
                     handler: async function (response) {
                         // Verify payment on backend
-                        const verifyResponse = await fetch('http://localhost:3000/api/verify-payment', {
+                        const verifyResponse = await fetch('http://localhost:10000/api/verify-payment', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -294,14 +324,15 @@
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_payment_id: response.razorpay_payment_id,
                                 razorpay_signature: response.razorpay_signature,
-                                email: email,
+                                email: userEmail,
+                                userId: currentUser.uid,
                                 plan: plan,
                                 amount: amount
                             })
                         });
-                        
+
                         const verifyData = await verifyResponse.json();
-                        
+
                         if (verifyData.success) {
                             alert('🎉 Payment Successful! Your account has been upgraded to ' + plan + ' plan!');
                             // Redirect to app or refresh page
@@ -310,16 +341,16 @@
                             alert('Payment verification failed. Please contact support.');
                         }
                     },
-                    
+
                     // Payment modal settings
                     prefill: {
-                        email: email,
+                        email: userEmail,
                         contact: '' // Can add phone number
                     },
                     theme: {
                         color: '#667eea'
                     },
-                    
+
                     // Modal settings
                     modal: {
                         ondismiss: function() {
@@ -327,10 +358,10 @@
                         }
                     }
                 };
-                
+
                 const rzp = new Razorpay(options);
                 rzp.open();
-                
+
             } catch (error) {
                 console.error('Payment error:', error);
                 alert('Error initiating payment. Please try again.');
