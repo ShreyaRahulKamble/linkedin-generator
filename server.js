@@ -48,7 +48,13 @@ async function getUserData(userId) {
         if (!userDoc.exists) {
             return null;
         }
-        return userDoc.data();
+        const data = userDoc.data();
+        // Ensure plan has a default value
+        if (!data.plan) {
+            console.log(`⚠️ User ${userId} has no plan field. Defaulting to 'free'`);
+            data.plan = 'free';
+        }
+        return data;
     } catch (error) {
         console.error('Error getting user data:', error);
         return null;
