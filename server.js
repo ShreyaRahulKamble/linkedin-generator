@@ -284,6 +284,16 @@ app.post('/api/update-profile', async (req, res) => {
 app.post('/api/create-order', async (req, res) => {
     try {
         const { amount, plan, userId } = req.body;
+
+        // Check if Razorpay credentials are configured
+        if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+            console.error('❌ Razorpay credentials not configured');
+            return res.status(500).json({
+                success: false,
+                error: 'Payment gateway not configured. Please contact support.'
+            });
+        }
+
         const order = await razorpay.orders.create({
             amount: amount * 100,
             currency: process.env.RAZORPAY_CURRENCY || 'INR',
@@ -298,7 +308,11 @@ app.post('/api/create-order', async (req, res) => {
             razorpayKeyId: process.env.RAZORPAY_KEY_ID
         });
     } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        console.error('❌ Error creating order:', error.message);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to initiate payment. ' + error.message
+        });
     }
 });
 
