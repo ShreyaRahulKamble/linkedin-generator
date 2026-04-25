@@ -734,9 +734,13 @@
     
     // ── Credits display ─────────────────────────────────────────────
     function updateCredits() {
+        console.log('📊 updateCredits() called');
+        console.log('   userData:', userData);
+
         if (userData) {
             userCredits = userData.credits;
             userPlan = userData.plan;
+            console.log(`   ✅ Set userCredits=${userCredits}, userPlan=${userPlan}`);
         }
         document.getElementById('creditCount').textContent = userCredits;
 
@@ -749,10 +753,14 @@
         }
         document.getElementById('creditLimit').textContent = creditLimit;
 
+        console.log(`   Checking: userPlan=${userPlan}, userCredits=${userCredits}`);
+
         if (userPlan === 'free' && userCredits <= 0) {
+            console.log('   ✅ SHOWING UPGRADE BANNER (free plan with 0 credits)');
             document.getElementById('upgradeBanner').style.display = 'block';
             document.getElementById('generateBtn').disabled = true;
         } else {
+            console.log('   ❌ NOT showing banner');
             document.getElementById('upgradeBanner').style.display = 'none';
             document.getElementById('generateBtn').disabled = false;
         }
